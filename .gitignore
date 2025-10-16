@@ -13,6 +13,7 @@ target/
 mvnw
 mvnw.cmd
 
+
 # === IntelliJ / VSCode ===
 .idea/
 .vscode/
@@ -20,9 +21,11 @@ mvnw.cmd
 *.ipr
 *.iml
 
+
 # === OS Files ===
 Thumbs.db
 .DS_Store
+
 
 # === Node / React ===
 node_modules/
@@ -33,6 +36,8 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
+
 # === Misc ===
 /frontend/.env
 /backend/.env
+
