@@ -63,6 +63,7 @@ cd PawsitiveDrive
 
     🧠 Features (Planned)
 
+
 🐶 User authentication (pet owners, organizations)
 
 📋 Manage pet adoption and rescue drives
@@ -79,4 +80,3 @@ cd PawsitiveDrive
     Kurt David Monteclaro – Frontend Developer
     Andrei Sam Loy - Frontend Developer
     Xavier John Sabornido - Backend Developer
-    

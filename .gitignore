@@ -1,29 +1,38 @@
-# Node dependencies
+# === Java / Spring Boot ===
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.log
+*.out
+*.swp
+.DS_Store
+.mvn/
+mvnw
+mvnw.cmd
+
+# === IntelliJ / VSCode ===
+.idea/
+.vscode/
+*.iws
+*.ipr
+*.iml
+
+# === OS Files ===
+Thumbs.db
+.DS_Store
+
+# === Node / React ===
 node_modules/
-
-# Environment files
+build/
 .env
-*.env
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
-pnpm-debug.log*
-logs/
-*.log
+yarn-error.log*
+package-lock.json
 
-# Build output
-dist/
-build/
-coverage/
-
-# OS/system files
-.DS_Store
-Thumbs.db
-
-# Editor settings
-.vscode/
-
-# Supabase temporary files
-supabase/.temp/
-supabase/functions/.netlify/
+# === Misc ===
+/frontend/.env
+/backend/.env
