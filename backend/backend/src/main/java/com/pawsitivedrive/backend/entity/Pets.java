@@ -19,6 +19,7 @@ public class Pets {
     private String gender;
     private String status;
     private String description;
+    private String image_url;
     private LocalDateTime created_at = LocalDateTime.now();
 
     @ManyToOne
@@ -107,5 +108,13 @@ public class Pets {
 
     public void setAddedBy(Users addedBy) {
         this.addedBy = addedBy;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 }
