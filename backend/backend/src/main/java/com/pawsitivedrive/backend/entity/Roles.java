@@ -1,5 +1,6 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class Roles {
     private String role_name; // Admin / Donator / Adoptor
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("role")
     private List<Users> users;
 
     // Getters and Setters

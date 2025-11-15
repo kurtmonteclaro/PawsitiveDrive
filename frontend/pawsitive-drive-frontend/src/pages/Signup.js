@@ -20,7 +20,7 @@ export default function Signup() {
       await signup(name, email, password, role);
       nav('/');
     } catch (e1) {
-      setError('Registration failed. Please check your information and try again.');
+      setError(e1.message || 'Registration failed. Please check your information and try again.');
     } finally {
       setLoading(false);
     }

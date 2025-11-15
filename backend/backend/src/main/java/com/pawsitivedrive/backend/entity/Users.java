@@ -1,5 +1,6 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,6 +58,7 @@ public class Users {
         this.email = email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
