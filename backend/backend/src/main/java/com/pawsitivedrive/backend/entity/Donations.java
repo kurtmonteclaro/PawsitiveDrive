@@ -51,6 +51,16 @@ public class Donations {
 
     public String getPayment_method() {
         return payment_method;
+
+    }
+
+    // Method to read the list of histories
+    public List<DonationHistory> getHistories() {
+        return histories;
+    }
+
+    public void setHistories(List<DonationHistory> histories) {
+        this.histories = histories;
     }
 
     public void setPayment_method(String payment_method) {
