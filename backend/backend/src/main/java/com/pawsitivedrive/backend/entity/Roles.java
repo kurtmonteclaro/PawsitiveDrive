@@ -11,12 +11,17 @@ public class Roles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long role_id;
 
-    private String role_name; // Admin / Donator / Adoptor
+    // FIX 1: Add unique constraint since role names must be unique
+    @Column(unique = true) 
+    private String role_name; // Admin / Donor / Adoptor
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<Users> users;
+    
+    // FIX 2: Required no-argument constructor for JPA
+    public Roles() {} 
 
-    // Getters and Setters
+    // --- Getters and Setters ---
     public Long getRole_id() {
         return role_id;
     }
@@ -31,5 +36,13 @@ public class Roles {
 
     public void setRole_name(String role_name) {
         this.role_name = role_name;
+    }
+
+    public List<Users> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<Users> users) {
+        this.users = users;
     }
 }

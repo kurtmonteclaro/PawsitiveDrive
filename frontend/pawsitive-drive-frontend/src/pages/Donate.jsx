@@ -34,12 +34,17 @@ export default function Donate() {
         status: 'Completed'
       };
 
-      // If donating to a specific pet, include pet reference
+      // If donating to a specific pet, include user reference
       if (pet && user) {
+        // Fetch full user details to include in donation data if needed by backend
         const userRes = await axios.get(`/api/users/${user.user_id || user.id}`);
         donationData.user = userRes.data;
+        // The pet reference is usually sent separately or determined by the context on the backend, 
+        // but for completeness, we could add pet_id to donationData if the backend expects it.
+        // Since the original code didn't explicitly include pet reference in donationData before
+        // the post, we'll keep the minimal change.
       }
-
+      
       const res = await axios.post('/api/donations', donationData);
       
       if (res.status === 201) {

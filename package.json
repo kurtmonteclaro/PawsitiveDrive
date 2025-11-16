@@ -1,0 +1,20 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"npm run start-react\" \"npm run start-backend\"",
+    
+    "start-backend": "cd D:\\CSIT340\\PawsitiveDrive\\backend && mvn spring-boot:run", 
+    
+    "start-react": "cd D:\\CSIT340\\PawsitiveDrive\\frontend\\pawsitive-drive-frontend && react-scripts start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1" 
+  }
+}

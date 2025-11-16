@@ -11,6 +11,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
+// ... (Navbar and App functions remain the same) ...
+
 function Navbar() {
   const { role } = useUserRole();
   const { user, logout } = useAuth();

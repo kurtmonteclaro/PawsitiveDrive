@@ -69,6 +69,8 @@ export default function AdminDashboard() {
 
     try {
       // Get user details to set addedBy
+      // NOTE: This call to /api/users/${user.user_id || user.id} is complex and might be simplified
+      // if your AuthContext already contains the full user object expected by the backend.
       const userRes = await axios.get(`/api/users/${user.user_id || user.id}`);
       const fullUser = userRes.data;
 
