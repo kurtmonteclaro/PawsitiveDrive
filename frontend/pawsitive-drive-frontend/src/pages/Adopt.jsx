@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; 
 import { Link } from 'react-router-dom';
 
 export default function Adopt() {
@@ -27,15 +27,28 @@ export default function Adopt() {
   };
 
   const handleAdopt = async (pet) => {
+    // Show confirmation modal if selectedPet is null
+    if (!selectedPet) {
+      setSelectedPet(pet);
+      return;
+    }
+
     if (!user) {
       setMessage('Please log in to adopt a pet.');
       setTimeout(() => setMessage(''), 3000);
+      setSelectedPet(null);
       return;
     }
 
     try {
       // Get full user object
-      const userRes = await axios.get(`/api/users/${user.user_id || user.id}`);
+      // Note: Assuming user.user_id or user.id is the identifier for the backend
+      const userId = user.user_id || user.id;
+      if (!userId) {
+        throw new Error("User ID is missing.");
+      }
+      
+      const userRes = await axios.get(`/api/users/${userId}`);
       const fullUser = userRes.data;
 
       // Get full pet object
@@ -57,18 +70,23 @@ export default function Adopt() {
       console.error('Failed to submit adoption application:', err);
       setMessage('Failed to submit adoption application. Please try again.');
       setTimeout(() => setMessage(''), 3000);
+    } finally {
+        // Ensure modal closes after action
+        setSelectedPet(null);
     }
   };
 
   const handleDonate = (pet) => {
     // Navigate to donate page with pet ID
+    // Use Link or useNavigate if this were a single-file React component, 
+    // but window.location.href works for navigation to other routes.
     window.location.href = `/donate?petId=${pet.pet_id}&petName=${encodeURIComponent(pet.name || '')}`;
   };
 
   if (loading) return <div className="loading">Loading pets…</div>;
 
   return (
-    <div>
+    <div className="adopt-page-container">
       <div className="page-header">
         <h2>Dogs and Cats Available for Adoption</h2>
         <p>Find your perfect companion and give them a loving home</p>
@@ -117,7 +135,8 @@ export default function Adopt() {
                 <div className="card-actions">
                   <button 
                     className="btn accent small" 
-                    onClick={() => handleAdopt(p)}
+                    // This now triggers the modal/confirmation first
+                    onClick={() => setSelectedPet(p)}
                     style={{ flex: 1 }}
                   >
                     🐾 Adopt
@@ -144,10 +163,14 @@ export default function Adopt() {
               <button className="modal-close" onClick={() => setSelectedPet(null)}>×</button>
             </div>
             <div>
-              <p>Are you sure you want to adopt {selectedPet.name}?</p>
+              <p>Are you sure you want to submit an adoption application for {selectedPet.name}?</p>
               <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                <button className="btn accent" onClick={() => handleAdopt(selectedPet)}>
-                  Yes, Adopt
+                <button 
+                    className="btn accent" 
+                    // Pass selectedPet to handleAdopt for processing
+                    onClick={() => handleAdopt(selectedPet)}
+                >
+                  Yes, Submit Application
                 </button>
                 <button className="btn outline" onClick={() => setSelectedPet(null)}>
                   Cancel

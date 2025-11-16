@@ -30,6 +30,18 @@ public class Pets {
     private List<AdoptionApplications> applications;
 
     // Getters and Setters
+
+    // FIX: Add getter for 'applications' to resolve the "Variable is never read" warning.
+    public List<AdoptionApplications> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(List<AdoptionApplications> applications) {
+        this.applications = applications;
+    }
+    
+    // Existing Getters and Setters...
+    
     public Long getPet_id() {
         return pet_id;
     }
