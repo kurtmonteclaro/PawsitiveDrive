@@ -1,138 +1,269 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Home() {
-    const [featuredPets, setFeaturedPets] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [featuredPets, setFeaturedPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        // Load a few featured pets (first 3 available)
-        axios.get('/api/pets?status=Available')
-            .then(res => {
-                setFeaturedPets(res.data.slice(0, 3));
-            })
-            .catch(err => {
-                console.error('Failed to load featured pets:', err);
-                setError('Could not load featured pets.');
-                setFeaturedPets([]);
-            })
-            .finally(() => setLoading(false));
-    }, []);
+  // Load featured pets
+  useEffect(() => {
+    axios
+      .get("/api/pets?status=Available")
+      .then((res) => {
+        console.log("Pets loaded successfully", res.data);
+        setFeaturedPets(res.data.slice(0, 3));
+      })
+      .catch((err) => {
+        console.error("Error loading pets:", err);
+        setError("Failed to load featured pets.");
+        setFeaturedPets([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-    return (
-        <div className="home-container">
-            {/* --- Hero Section --- */}
-            <section className="hero bg-indigo-600 text-white py-24 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-4xl mx-auto text-center hero-content">
-                    <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight">
-                        Give Every Pet a Chance at <span className="text-yellow-300 accent">Love</span>. Adopt Today.
-                    </h1>
-                    <p className="text-xl md:text-2xl mb-8 opacity-95">
-                        Browse our furry friends ready for adoption and see how you can help make a difference in their lives.
-                    </p>
-                    <div className="flex justify-center space-x-4 hero-actions">
-                        <Link to="/adopt" className="btn bg-white text-indigo-600 hover:bg-gray-100 text-lg font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 primary">
-                            🐾 Explore Pets
-                        </Link>
-                        <Link 
-                            to="/donate" 
-                            className="btn text-white text-lg font-bold py-3 px-8 rounded-full border-2 border-white hover:bg-white hover:text-indigo-600 transition duration-300"
-                        >
-                            💝 Donate
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* --- Featured Pets Section --- */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                {loading ? (
-                    <div className="text-center py-10 text-gray-500">Loading featured pets...</div>
-                ) : error ? (
-                    <div className="text-center py-10 text-red-600">{error}</div>
-                ) : featuredPets.length > 0 && (
-                    <section className="py-16">
-                        <div className="page-header text-center mb-12">
-                            <h2 className="text-3xl font-bold text-gray-800">Featured Pets</h2>
-                            <p className="text-lg text-gray-500">Meet some of our wonderful pets looking for their forever homes</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {featuredPets.map(pet => (
-                                <article key={pet.pet_id} className="bg-white rounded-xl shadow-lg overflow-hidden card transition-all hover:shadow-xl">
-                                    <div className="h-64 overflow-hidden pet-thumb">
-                                        {pet.image_url ? (
-                                            <img 
-                                                src={pet.image_url} 
-                                                alt={pet.name}
-                                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">No Image Available</div>';
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
-                                                No Image Available
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="p-5 card-body">
-                                        <div className="flex justify-between items-start mb-2 card-title">
-                                            <h4 className="text-xl font-semibold text-gray-900">{pet.name}</h4>
-                                            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700 badge available">
-                                                Available
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-gray-500 mb-3 muted">
-                                            {pet.breed} • {pet.age} {pet.age === 1 ? 'year' : 'years'} old
-                                        </p>
-                                        <p className="text-gray-700 leading-relaxed text-sm mb-4">
-                                            {pet.description ? (pet.description.length > 100 ? pet.description.substring(0, 100) + '...' : pet.description) : 'A wonderful companion looking for a loving home.'}
-                                        </p>
-                                        <div className="card-actions">
-                                            <Link to="/adopt" className="btn bg-indigo-500 text-white hover:bg-indigo-600 w-full py-2 text-center rounded-lg text-sm transition duration-300 accent small">
-                                                View Details
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                        <div className="text-center mt-10">
-                            <Link to="/adopt" className="btn bg-indigo-600 text-white hover:bg-indigo-700 py-3 px-6 rounded-full primary">View All Available Pets</Link>
-                        </div>
-                    </section>
-                )}
-
-                {/* --- How You Can Help Section --- */}
-                <section className="my-16 bg-white p-8 sm:p-12 rounded-xl shadow-2xl border border-gray-100">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-10">How You Can Help Our Mission</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            
-                            <div className="p-4">
-                                <div className="text-5xl mb-4 text-indigo-500">🐾</div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Adopt</h3>
-                                <p className="text-gray-600">Give a pet a loving forever home and change two lives—theirs and yours.</p>
-                            </div>
-                            
-                            <div className="p-4">
-                                <div className="text-5xl mb-4 text-pink-500">💝</div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Donate</h3>
-                                <p className="text-gray-600">Your financial support helps cover medical care, food, and shelter.</p>
-                            </div>
-                            
-                            <div className="p-4">
-                                <div className="text-5xl mb-4 text-green-500">📣</div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Share</h3>
-                                <p className="text-gray-600">Spread the word about our pets and events on social media.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
+  // Scroll reveal + navbar darken
+  useEffect(() => {
+    // Scroll reveal
+    const revealElements = document.querySelectorAll(".reveal");
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
     );
+    revealElements.forEach((el) => observer.observe(el));
+
+    // Navbar darken on scroll
+    const header = document.querySelector(".site-header");
+    const onScroll = () => {
+      if (!header) return;
+      if (window.scrollY > 40) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    };
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return (
+    <div className="home">
+      {/* ================= HERO (FULL-WIDTH PARALLAX) ================= */}
+      <section className="hero-parallax">
+        <div className="hero-overlay" />
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Find a Companion.
+            <br />
+            Change a Life.
+          </h1>
+          <p className="hero-subtitle">
+            Because every animal deserves safety, compassion, and a loving home.
+          </p>
+          <div className="hero-buttons">
+            <Link to="/adopt" className="btn-primary">
+              Browse Pets
+            </Link>
+            <Link to="/donate" className="btn-outline">
+              Make a Donation
+            </Link>
+          </div>
+        </div>
+        <div className="hero-fade" />
+      </section>
+
+      {/* ================= OUR MISSION ================= */}
+      <section className="section mission reveal">
+        <div className="section-inner">
+          <h2 className="section-title">Our Mission</h2>
+          <p className="section-text">
+            Pawsitive Drive exists to rescue, rehabilitate, and rehome animals in need.
+            We believe every pet deserves a second chance at a safe and loving home.
+          </p>
+        </div>
+      </section>
+
+      {/* ================= FEATURED PETS ================= */}
+      <section className="section reveal">
+        <div className="section-inner">
+          <h2 className="section-title">Featured Pets</h2>
+          <p className="section-subtitle">
+            Meet some of the rescued animals currently waiting for their forever homes.
+          </p>
+
+          {loading ? (
+            <div className="loading">Loading pets...</div>
+          ) : error ? (
+            <div className="loading">{error}</div>
+          ) : (
+            <div className="pets-grid">
+              {featuredPets.map((pet, index) => (
+                <div
+                  key={pet.pet_id}
+                  className="pet-card reveal"
+                  style={{ animationDelay: `${index * 0.15}s` }}
+                >
+                  <div className="pet-image">
+                    {pet.image_url ? (
+                      <img src={pet.image_url} alt={pet.name} />
+                    ) : (
+                      <div className="no-image">No Image Available</div>
+                    )}
+                  </div>
+                  <div className="pet-body">
+                    <div className="pet-header">
+                      <h3 className="pet-name">{pet.name}</h3>
+                      <span className="badge">Available</span>
+                    </div>
+                    <p className="pet-meta">
+                      {pet.breed} • {pet.age} {pet.age === 1 ? "year" : "years"} old
+                    </p>
+                    <p className="pet-desc">
+                      {pet.description ||
+                        "This pet is ready to join a loving and compassionate home."}
+                    </p>
+                    <Link to="/adopt" className="btn-card">
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="section-footer">
+            <Link to="/adopt" className="btn-dark">
+              View All Pets
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= WHY ADOPT WITH US ================= */}
+      <section className="section features reveal">
+        <div className="section-inner blob">
+          <h2 className="section-title">Why Adopt With Pawsitive Drive?</h2>
+          <div className="features-grid">
+            <div className="feature-box">
+              <h3>Ethical & Responsible</h3>
+              <p>
+                We follow strict adoption guidelines to ensure pets and families are
+                matched safely and thoughtfully.
+              </p>
+            </div>
+
+            <div className="feature-box">
+              <h3>Health & Wellness</h3>
+              <p>
+                Every pet receives medical screening, vaccinations, and proper care before
+                being placed for adoption.
+              </p>
+            </div>
+
+            <div className="feature-box">
+              <h3>Lifetime Support</h3>
+              <p>
+                Our team is here to guide you before, during, and after adoption as your
+                pet settles into their new home.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= SUCCESS STORIES ================= */}
+      <section className="section success reveal">
+        <div className="section-inner">
+          <h2 className="section-title">Success Stories</h2>
+          <div className="success-grid">
+            <div className="story">
+              <div className="story-img story1" />
+              <h3>Max's New Chapter</h3>
+              <p>
+                Once abandoned, Max now spends his days playing in the yard with his
+                family in Cebu.
+              </p>
+            </div>
+            <div className="story">
+              <div className="story-img story2" />
+              <h3>Luna Finds Home</h3>
+              <p>
+                After weeks of recovery, Luna finally found a home that gives her the
+                care and comfort she deserves.
+              </p>
+            </div>
+            <div className="story">
+              <div className="story-img story3" />
+              <h3>Charlie’s Second Chance</h3>
+              <p>
+                Rescued from the streets, Charlie is now a confident, happy companion.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= HOW ADOPTION WORKS ================= */}
+      <section className="section timeline reveal">
+        <div className="section-inner">
+          <h2 className="section-title">How Adoption Works</h2>
+          <div className="timeline-steps">
+            <div className="step">
+              <h3>1. Browse</h3>
+              <p>Explore pets and learn their stories, personalities, and needs.</p>
+            </div>
+            <div className="step">
+              <h3>2. Apply</h3>
+              <p>Send an application so we can get to know you and your home.</p>
+            </div>
+            <div className="step">
+              <h3>3. Meet</h3>
+              <p>Schedule a meet-and-greet and finalize the adoption.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= GET INVOLVED ================= */}
+      <section className="section involved reveal">
+        <div className="section-inner blob">
+          <h2 className="section-title">Get Involved</h2>
+          <p className="section-subtitle">There are many ways you can help save lives.</p>
+          <div className="involved-grid">
+            <div className="involved-card">
+              <h3>Volunteer</h3>
+              <p>Assist with shelter care, events, and community outreach.</p>
+            </div>
+            <div className="involved-card">
+              <h3>Foster</h3>
+              <p>Open your home to pets waiting for adoption or recovery.</p>
+            </div>
+            <div className="involved-card">
+              <h3>Sponsor</h3>
+              <p>Help fund medical care, food, and supplies for rescued animals.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+   
+
+      {/* Floating Donate button */}
+      <Link to="/donate" className="floating-donate">
+        Donate
+      </Link>
+    </div>
+  );
 }
