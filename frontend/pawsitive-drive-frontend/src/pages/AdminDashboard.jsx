@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { useUserRole } from '../context/UserRoleContext.jsx'; // Ensure path is correct
-import { useAuth } from '../context/AuthContext.jsx'; // Ensure path is correct
+import { useUserRole } from '../context/UserRoleContext'; // Ensure path is correct
+import { useAuth } from '../context/AuthContext'; 
 
 export default function AdminDashboard() {
     const { role } = useUserRole();
