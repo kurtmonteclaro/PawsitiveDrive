@@ -61,18 +61,18 @@ public class PetsController {
             Map<String, Object> userMap = (Map<String, Object>) addedByObj; 
             Object userIdObj = userMap.getOrDefault("user_id", userMap.get("id"));
             
-            if (userIdObj instanceof Number) {
+            if (userIdObj instanceof Number number) {
                 // If it's already a number, convert directly to Long (Fixes "Unnecessary temporary")
-                return ((Number) userIdObj).longValue();
+                return number.longValue();
             } else if (userIdObj != null) {
                 // If it's a String, parse it
                 return Long.valueOf(userIdObj.toString());
             }
         } else {
             // Case 2: 'addedBy' is sent as a raw user ID (e.g., 1 or "1")
-            if (addedByObj instanceof Number) {
+            if (addedByObj instanceof Number number) {
                 // If it's a number, convert directly to Long (Fixes "Unnecessary temporary")
-                return ((Number) addedByObj).longValue();
+                return number.longValue();
             } else {
                 // If it's a String, parse it
                 return Long.valueOf(addedByObj.toString());
@@ -98,11 +98,11 @@ public class PetsController {
             }
             
             // Use Number.intValue() if it's already a number (Fixes "Unboxing possibly null value")
-            if (ageObj instanceof Number) {
-                pet.setAge(((Number) ageObj).intValue());
+            if (ageObj instanceof Number number) {
+                pet.setAge(number.intValue());
             } else {
                 // If it's a String (e.g., "2"), parse it
-                pet.setAge(Integer.valueOf(ageObj.toString()));
+                pet.setAge(Integer.parseInt(ageObj.toString()));
             }
 
             pet.setGender((String) payload.get("gender"));
