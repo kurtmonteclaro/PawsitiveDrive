@@ -2458,3 +2458,149 @@ form textarea:focus {
         flex-direction: column;
     }
 }
+
+/* SIGNUP BACKGROUND (DOG THEME) */
+.signup-background {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("/public/dog.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Dark overlay for readability */
+.signup-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+/* Center card on top of overlay */
+.signup-centered {
+  position: relative;
+  z-index: 2;
+}
+
+/* Make the card compact like a hero card */
+.compact-card {
+  max-width: 420px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 30px 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  overflow: hidden;
+}
+
+/* Make form scrollable if content is too high */
+.auth-form {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Smooth scrollbar for form */
+.auth-form::-webkit-scrollbar {
+  width: 6px;
+}
+.auth-form::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+/* Header styling */
+.auth-header h1 {
+  margin-bottom: 5px;
+  font-size: 1.9rem;
+  color: #333;
+}
+.auth-header p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* LOGIN BACKGROUND (DOG THEME) */
+.login-background {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("/public/stray.jpg"); /* Login-specific image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Overlay for readability */
+.signup-overlay { 
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+/* Center card */
+.signup-centered {
+  position: relative;
+  z-index: 2;
+}
+
+/* Compact card style */
+.compact-card {
+  max-width: 400px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 30px 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  overflow: visible; /* changed from hidden/scroll */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove scroll bar from login form */
+.auth-form {
+  max-height: none; /* allow natural height */
+  overflow: visible;
+}
+
+/* Header styles */
+.auth-header h1 {
+  margin-bottom: 5px;
+  font-size: 1.9rem;
+  color: #333;
+}
+.auth-header p {
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Buttons */
+.btn.primary {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn.primary:hover {
+  background-color: #3730a3;
+}

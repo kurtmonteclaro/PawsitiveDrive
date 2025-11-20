@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
+import "../App.css";
 
 export default function Signup() {
   const { signup } = useAuth();
   const nav = useNavigate();
   
-  // ADDED: State for address and contact
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,12 +21,10 @@ export default function Signup() {
     setLoading(true);
     setError('');
     try {
-      // UPDATED: Pass address and contact to the signup function
       await signup(name, email, password, role, address, contact);
       nav('/');
     } catch (e1) {
       console.error('SIGNUP ERROR:', e1);
-      // Attempt to display a more specific error message if available
       const message = e1.response?.data?.message || e1.message || 'Registration failed. Please check your information and try again.';
       setError(message);
     } finally {
@@ -35,8 +33,10 @@ export default function Signup() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="signup-background">
+      <div className="signup-overlay"></div>
+
+      <div className="signup-centered auth-card compact-card">
         <div className="auth-header">
           <h1>Create Your Account</h1>
           <p>Join Pawsitive Drive and make a difference</p>
@@ -90,7 +90,6 @@ export default function Signup() {
             <small className="form-hint">Minimum 6 characters</small>
           </div>
 
-          {/* NEW CONTACT FIELD */}
           <div className="form-group">
             <label htmlFor="contact">Contact Number</label>
             <input
@@ -101,12 +100,11 @@ export default function Signup() {
               required
               className="form-input"
               placeholder="e.g., 09xxxxxxxxx"
-              pattern="[0-9]{11}" // Simple 11-digit number validation
+              pattern="[0-9]{11}"
             />
-            <small className="form-hint">Must be a valid 11-digit phone number (e.g., 09123456789)</small>
+            <small className="form-hint">Must be a valid 11-digit phone number</small>
           </div>
-          
-          {/* NEW ADDRESS FIELD */}
+
           <div className="form-group">
             <label htmlFor="address">Address</label>
             <input
@@ -116,7 +114,7 @@ export default function Signup() {
               onChange={e => setAddress(e.target.value)}
               required
               className="form-input"
-              placeholder="Enter your full street address"
+              placeholder="Enter your street address"
             />
           </div>
 
