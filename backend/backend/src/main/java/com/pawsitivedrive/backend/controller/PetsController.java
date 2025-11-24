@@ -4,10 +4,12 @@ import com.pawsitivedrive.backend.entity.Pets;
 import com.pawsitivedrive.backend.entity.Users;
 import com.pawsitivedrive.backend.repository.PetsRepository;
 import com.pawsitivedrive.backend.repository.UsersRepository;
+import com.pawsitivedrive.backend.service.FileStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.List;
@@ -19,10 +21,12 @@ public class PetsController {
 
     private final PetsRepository petsRepository;
     private final UsersRepository usersRepository;
+    private final FileStorageService fileStorageService;
 
-    public PetsController(PetsRepository petsRepository, UsersRepository usersRepository) {
+    public PetsController(PetsRepository petsRepository, UsersRepository usersRepository, FileStorageService fileStorageService) {
         this.petsRepository = petsRepository;
         this.usersRepository = usersRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -35,6 +39,19 @@ public class PetsController {
             return petsRepository.findByStatusIgnoreCase(status);
         }
         return petsRepository.findAll();
+    }
+    
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String filename = fileStorageService.store(file);
+            String url = fileStorageService.buildPublicUrl(filename);
+            return ResponseEntity.ok(Map.of("url", url, "filename", filename));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", "Failed to upload image: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")

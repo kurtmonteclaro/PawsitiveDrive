@@ -3,13 +3,18 @@ import axios from 'axios';
 import { useUserRole } from '../context/UserRoleContext'; // Ensure path is correct
 import { useAuth } from '../context/AuthContext'; 
 
+const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
+
+const ADMIN_ROLE_IDS = new Set([2]);
+
 export default function AdminDashboard() {
     const { role } = useUserRole();
     const { user } = useAuth();
     
-    // Check if user is admin based on their actual role
-    // Using role from UserRoleContext (if available) or checking the user object directly
-    const isAdmin = role === 'Admin' || (user && user.role?.role_name === 'Admin');
+    const normalize = (value) => value ? String(value).trim().toLowerCase() : null;
+    const resolvedRole = normalize(role) || normalize(user?.role?.role_name) || normalize(user?.role_name);
+    const roleId = user?.role?.role_id ?? user?.role_id ?? user?.roleId;
+    const isAdmin = resolvedRole === 'admin' || (roleId && ADMIN_ROLE_IDS.has(Number(roleId)));
 
     const [pets, setPets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,6 +22,8 @@ export default function AdminDashboard() {
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [formLoading, setFormLoading] = useState(false); // Loading state for form submission
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [uploadError, setUploadError] = useState('');
 
     // Initial state for new pet creation/editing
     const initialFormData = {
@@ -42,7 +49,7 @@ export default function AdminDashboard() {
     // --- Data Fetching and Filtering ---
     const loadPets = async () => {
         try {
-            const res = await axios.get('/api/pets');
+            const res = await axios.get(`${API_ROOT}/pets`);
             setPets(res.data);
         } catch (err) {
             console.error('Failed to load pets:', err);
@@ -77,26 +84,47 @@ export default function AdminDashboard() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleImageUpload = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const data = new FormData();
+        data.append('file', file);
+        setUploadingImage(true);
+        setUploadError('');
+
+        try {
+            const res = await axios.post(`${API_ROOT}/pets/upload-image`, data);
+            setFormData(prev => ({ ...prev, image_url: res.data.url }));
+        } catch (err) {
+            console.error('Failed to upload image:', err);
+            setUploadError('Failed to upload image. Please try again.');
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
             setMessage('Please log in to create pets.');
             return;
         }
+        if (!formData.image_url) {
+            setMessage('Please upload a pet photo before publishing.');
+            setTimeout(() => setMessage(''), 3000);
+            return;
+        }
         setFormLoading(true);
 
         try {
-            // Fetch full user object to ensure entity mapping works on backend for 'addedBy'
-            const userRes = await axios.get(`/api/users/${user.user_id || user.id}`);
-            const fullUser = userRes.data;
-
             const petData = {
                 ...formData,
-                age: parseInt(formData.age),
-                addedBy: fullUser
+                age: parseInt(formData.age, 10),
+                addedBy: user.user_id || user.id
             };
 
-            await axios.post('/api/pets', petData);
+            await axios.post(`${API_ROOT}/pets`, petData);
             
             setMessage('Pet created successfully! 🎉');
             setShowForm(false);
@@ -114,7 +142,7 @@ export default function AdminDashboard() {
 
     const updateStatus = async (pet, status) => {
         try {
-            const res = await axios.put(`/api/pets/${pet.pet_id}`, { ...pet, status });
+            const res = await axios.put(`${API_ROOT}/pets/${pet.pet_id}`, { ...pet, status });
             // Update local state with the returned pet object
             setPets(prev => prev.map(x => x.pet_id === pet.pet_id ? res.data : x));
             setMessage(`Status for ${pet.name} updated to ${status}.`);
@@ -128,7 +156,7 @@ export default function AdminDashboard() {
     const removePet = async (petId) => {
         if (!window.confirm('Are you sure you want to permanently delete this pet? This action cannot be undone.')) return;
         try {
-            await axios.delete(`/api/pets/${petId}`);
+            await axios.delete(`${API_ROOT}/pets/${petId}`);
             setPets(prev => prev.filter(x => x.pet_id !== petId));
             setMessage('Pet deleted successfully.🗑️');
             setTimeout(() => setMessage(''), 3000);
@@ -198,20 +226,44 @@ export default function AdminDashboard() {
 
                             <FormGroup label="Status *" name="status" value={formData.status} onChange={handleInputChange} type="select" options={['Available', 'Pending', 'Adopted']} required />
 
-                            <FormGroup label="Image URL *" name="image_url" value={formData.image_url} onChange={handleInputChange} type="url" placeholder="https://example.com/pet-image.jpg" required />
-                            {formData.image_url && (
-                                <div className="image-preview w-40 h-40 border border-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
-                                    <img 
-                                        src={formData.image_url} 
-                                        alt="Preview" 
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-red-500 bg-gray-100">Invalid URL</div>';
-                                        }} 
+                            <div className="form-group space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Pet Photo *</label>
+                                {formData.image_url ? (
+                                    <div className="image-preview w-40 h-40 border border-gray-300 rounded-lg overflow-hidden flex items-center justify-center">
+                                        <img
+                                            src={formData.image_url}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-xs text-red-500 bg-gray-100">Invalid image</div>';
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500">Upload a photo of the pet (required).</p>
+                                )}
+                                <div className="space-y-1">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={uploadingImage}
+                                        required={!formData.image_url}
                                     />
+                                    {uploadingImage && <p className="text-sm text-gray-600">Uploading image…</p>}
+                                    {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+                                    {formData.image_url && (
+                                        <button
+                                            type="button"
+                                            className="text-xs text-red-600 underline"
+                                            onClick={() => setFormData(prev => ({ ...prev, image_url: '' }))}
+                                        >
+                                            Remove image
+                                        </button>
+                                    )}
                                 </div>
-                            )}
+                            </div>
 
                             <FormGroup label="Description *" name="description" value={formData.description} onChange={handleInputChange} type="textarea" placeholder="Tell us about this pet's personality, needs, and story..." rows="4" required />
 
@@ -224,77 +276,67 @@ export default function AdminDashboard() {
             )}
 
             {/* Pets Table */}
-            <div className="overflow-x-auto bg-white rounded-xl shadow-lg table-wrap">
-                <table className="min-w-full divide-y divide-gray-200 table">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species/Breed</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age/Gender</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredPets.length === 0 ? (
-                            <tr>
-                                <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                                    No pets found in the "{filter}" category.
-                                </td>
-                            </tr>
-                        ) : (
-                            filteredPets.map(p => (
-                                <tr key={p.pet_id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {p.image_url ? (
-                                            <img 
-                                                src={p.image_url} 
-                                                alt={p.name}
-                                                className="w-12 h-12 object-cover rounded-md"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.parentElement.innerHTML = '<div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-500">No Image</div>';
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-500">No Image</div>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 font-semibold text-gray-900 whitespace-nowrap">{p.name}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{p.species} / {p.breed}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{p.age} yrs / {p.gender}</td>
-                                    <td className="px-6 py-4 max-w-xs text-sm text-gray-700 overflow-hidden text-ellipsis desc" title={p.description}>
-                                        {p.description.substring(0, 50)}...
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <select 
-                                            value={p.status || ''} 
-                                            onChange={(e) => updateStatus(p, e.target.value)}
-                                            className={`p-2 border rounded-lg text-sm font-medium ${
-                                                p.status === 'Available' ? 'bg-green-100 text-green-700 border-green-300' :
-                                                p.status === 'Pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
-                                                p.status === 'Adopted' ? 'bg-indigo-100 text-indigo-700 border-indigo-300' :
-                                                'bg-gray-100 text-gray-700 border-gray-300'
-                                            }`}
-                                        >
-                                            <option value="">—</option>
-                                            <option>Available</option>
-                                            <option>Pending</option>
-                                            <option>Adopted</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button className="text-red-600 hover:text-red-900 transition duration-150 danger small" onClick={() => removePet(p.pet_id)}>
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+            <div className="admin-pets-table">
+                <div className="admin-pets-header">
+                    <span>Image</span>
+                    <span>Pet</span>
+                    <span>Type</span>
+                    <span>Age / Gender</span>
+                    <span>Description</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                </div>
+                <div className="admin-pets-body">
+                    {filteredPets.length === 0 ? (
+                        <div className="admin-pets-empty">
+                            No pets found in the "{filter}" category.
+                        </div>
+                    ) : (
+                        filteredPets.map((p) => (
+                            <div key={p.pet_id} className="admin-pets-row">
+                                <div className="pet-thumb">
+                                    {p.image_url ? (
+                                        <img
+                                            src={p.image_url}
+                                            alt={p.name}
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.parentElement.innerHTML = '<div class="no-img">No Image</div>';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="no-img">No Image</div>
+                                    )}
+                                </div>
+                                <div className="pet-name">
+                                    <p>{p.name}</p>
+                                    <small>{p.created_at ? new Date(p.created_at).toLocaleDateString() : 'New entry'}</small>
+                                </div>
+                                <div className="pet-type">
+                                    <span>{p.species}</span>
+                                    <small>{p.breed}</small>
+                                </div>
+                                <div className="pet-age">
+                                    {p.age} yrs • {p.gender}
+                                </div>
+                                <div className="pet-description">
+                                    {p.description ? `${p.description.slice(0, 70)}${p.description.length > 70 ? '…' : ''}` : 'No description'}
+                                </div>
+                                <div className={`pet-status status-${String(p.status || '').toLowerCase()}`}>
+                                    <select value={p.status || ''} onChange={(e) => updateStatus(p, e.target.value)}>
+                                        <option value="">—</option>
+                                        <option>Available</option>
+                                        <option>Pending</option>
+                                        <option>Adopted</option>
+                                    </select>
+                                </div>
+                                <div className="pet-actions">
+                                    <button onClick={() => removePet(p.pet_id)}>Delete</button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );

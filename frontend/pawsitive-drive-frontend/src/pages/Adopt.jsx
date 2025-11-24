@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; 
-import { Link } from 'react-router-dom';
+
+const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 
 export default function Adopt() {
   const [pets, setPets] = useState([]);
@@ -16,7 +17,7 @@ export default function Adopt() {
 
   const loadPets = async () => {
     try {
-      const res = await axios.get('/api/pets?status=Available');
+      const res = await axios.get(`${API_ROOT}/pets?status=Available`);
       setPets(res.data);
     } catch (err) {
       console.error('Failed to load pets:', err);
@@ -48,11 +49,11 @@ export default function Adopt() {
         throw new Error("User ID is missing.");
       }
       
-      const userRes = await axios.get(`/api/users/${userId}`);
+      const userRes = await axios.get(`${API_ROOT}/users/${userId}`);
       const fullUser = userRes.data;
 
       // Get full pet object
-      const petRes = await axios.get(`/api/pets/${pet.pet_id}`);
+      const petRes = await axios.get(`${API_ROOT}/pets/${pet.pet_id}`);
       const fullPet = petRes.data;
 
       const application = {
@@ -61,7 +62,7 @@ export default function Adopt() {
         status: 'Pending'
       };
 
-      await axios.post('/api/applications', application);
+      await axios.post(`${API_ROOT}/applications`, application);
       setMessage(`Adoption application submitted for ${pet.name}!`);
       setSelectedPet(null);
       loadPets(); // Reload to update status if needed

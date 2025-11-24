@@ -3,6 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
 import "../App.css";
 
+const getRoleName = (user) => {
+    if (!user) return null;
+    const rawName = user.role?.role_name || user.role_name || user.role?.roleName || user.roleName;
+    return rawName ? String(rawName).trim() : null;
+};
+
 export default function Login() {
     const { login } = useAuth();
     const nav = useNavigate();
@@ -17,8 +23,13 @@ export default function Login() {
         setLoading(true);
         setError('');
         try {
-            await login(email, password);
-            nav('/');
+            const loggedInUser = await login(email, password);
+            const roleName = getRoleName(loggedInUser);
+            if (roleName?.toLowerCase() === 'admin') {
+                nav('/admin');
+            } else {
+                nav('/');
+            }
         } catch (e1) {
             const errorMessage = e1.response?.data?.message || e1.message || 'Invalid email or password. Please try again.';
             setError(errorMessage);

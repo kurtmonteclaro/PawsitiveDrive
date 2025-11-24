@@ -39,10 +39,10 @@ public class SecurityConfig {
             
             // 3. Configure request authorization
             .authorizeHttpRequests(authorize -> authorize
-                // CRITICAL FIX: Allow public access to /api/auth/** for signup/login
-                .requestMatchers("/api/auth/**").permitAll() 
-                
-                // All other requests must be authenticated (e.g., /api/user, /api/pets)
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/roles/**").permitAll()
+                .requestMatchers("/api/pets/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .anyRequest().authenticated()
             )
             

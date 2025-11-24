@@ -27,6 +27,9 @@ public class Users {
     @JoinColumn(name = "role_id")
     private Roles role; 
 
+    @Column(name = "role_name")
+    private String role_name;
+
     private String status; // active/suspended
     
     @Column(nullable = true)
@@ -51,7 +54,7 @@ public class Users {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = role;
+        this.setRole(role);
         this.status = status;
         this.created_at = LocalDateTime.now();
     }
@@ -68,7 +71,18 @@ public class Users {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public Roles getRole() { return role; }
-    public void setRole(Roles role) { this.role = role; }
+    public void setRole(Roles role) { 
+        this.role = role; 
+        this.role_name = role != null ? role.getRole_name() : null;
+    }
+    @PostLoad
+    public void syncRoleName() {
+        if (this.role != null && (this.role_name == null || this.role_name.isBlank())) {
+            this.role_name = this.role.getRole_name();
+        }
+    }
+    public String getRole_name() { return role_name; }
+    public void setRole_name(String role_name) { this.role_name = role_name; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getContact_number() { return contact_number; }
