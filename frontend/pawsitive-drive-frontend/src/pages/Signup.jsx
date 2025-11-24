@@ -3,6 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
 import "../App.css";
 
+const getRoleName = (user) => {
+  if (!user) return null;
+  const rawName = user.role?.role_name || user.role_name || user.role?.roleName || user.roleName;
+  return rawName ? String(rawName).trim() : null;
+};
+
 export default function Signup() {
   const { signup } = useAuth();
   const nav = useNavigate();
@@ -21,8 +27,9 @@ export default function Signup() {
     setLoading(true);
     setError('');
     try {
-      await signup(name, email, password, role, address, contact);
-      nav('/');
+      const newUser = await signup(name, email, password, role, address, contact);
+      const roleName = getRoleName(newUser) || role;
+      nav(roleName?.toLowerCase() === 'admin' ? '/admin' : '/');
     } catch (e1) {
       console.error('SIGNUP ERROR:', e1);
       const message = e1.response?.data?.message || e1.message || 'Registration failed. Please check your information and try again.';

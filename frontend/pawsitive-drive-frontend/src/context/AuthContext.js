@@ -3,8 +3,60 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
-// 🚨 FIX: Define the explicit URL for the backend server
-const API_BASE_URL = 'http://localhost:8080/api/auth';
+const API_ROOT = 'http://localhost:8080/api';
+const AUTH_API_URL = `${API_ROOT}/auth`;
+const ROLES_API_URL = `${API_ROOT}/roles`;
+
+let cachedRolesPromise = null;
+
+const fetchRolesOnce = () => {
+    if (!cachedRolesPromise) {
+        cachedRolesPromise = axios.get(ROLES_API_URL)
+            .then(res => Array.isArray(res.data) ? res.data : [])
+            .catch(err => {
+                cachedRolesPromise = null;
+                throw err;
+            });
+    }
+    return cachedRolesPromise;
+};
+
+const hasRoleName = (candidate) => Boolean(
+    candidate?.role?.role_name ||
+    candidate?.role_name ||
+    candidate?.role?.roleName ||
+    candidate?.roleName
+);
+
+const ensureRoleMetadata = async (rawUser) => {
+    if (!rawUser) return rawUser;
+
+    if (hasRoleName(rawUser)) return rawUser;
+
+    const roleId = rawUser.role?.role_id ?? rawUser.role_id ?? rawUser.roleId;
+    if (!roleId) return rawUser;
+
+    try {
+        const roles = await fetchRolesOnce();
+        const match = roles.find(r => Number(r.role_id) === Number(roleId));
+        if (!match) return rawUser;
+
+        const normalizedRole = {
+            role_id: Number(match.role_id),
+            role_name: match.role_name
+        };
+
+        return {
+            ...rawUser,
+            role: { ...(rawUser.role || {}), ...normalizedRole },
+            role_id: normalizedRole.role_id,
+            role_name: normalizedRole.role_name
+        };
+    } catch (err) {
+        console.warn('Failed to enrich user role metadata', err);
+        return rawUser;
+    }
+};
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(() => {
@@ -17,29 +69,50 @@ export function AuthProvider({ children }) {
         else window.localStorage.removeItem('pd_user');
     }, [user]);
 
+    useEffect(() => {
+        let cancelled = false;
+        const hydrate = async () => {
+            if (!user || hasRoleName(user)) return;
+            try {
+                const hydrated = await ensureRoleMetadata(user);
+                if (!cancelled && hydrated !== user) {
+                    setUser(hydrated);
+                }
+            } catch (err) {
+                console.warn('Failed to hydrate persisted user role metadata', err);
+            }
+        };
+        hydrate();
+        return () => { cancelled = true; };
+    }, [user]);
+
     const login = async (email, password) => {
-        // FIX: Use the explicit API_BASE_URL
-        const res = await axios.post(`${API_BASE_URL}/login`, { email, password });
-        setUser(res.data);
-        return res.data;
+        const res = await axios.post(`${AUTH_API_URL}/login`, { email, password });
+        const hydratedUser = await ensureRoleMetadata(res.data);
+        setUser(hydratedUser);
+        return hydratedUser;
     };
 
-    // 🚀 CRITICAL FIX: Added address and contact to parameters and the JSON payload
     const signup = async (name, email, password, role, address, contact) => {
-        // FIX: Use the explicit API_BASE_URL
-        const res = await axios.post(`${API_BASE_URL}/signup`, { 
+        const res = await axios.post(`${AUTH_API_URL}/signup`, { 
             name, 
             email, 
             password, 
             role, 
             address, 
-            contact_number: contact // 🚨 FIX: Changed the JSON key to match the Java property 'contact_number'
+            contact_number: contact
         });
-        setUser(res.data);
-        return res.data;
+        const hydratedUser = await ensureRoleMetadata(res.data);
+        setUser(hydratedUser);
+        return hydratedUser;
     };
 
-    const logout = () => setUser(null);
+    const logout = () => {
+        setUser(null);
+        if (typeof window !== 'undefined') {
+            window.location.href = '/';
+        }
+    };
 
     const value = useMemo(() => ({ user, login, signup, logout }), [user]);
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
