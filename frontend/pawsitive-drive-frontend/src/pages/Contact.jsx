@@ -49,10 +49,10 @@ const Contact = () => {
     );
 
     return (
-        <div className="contact-container">
-            <header className="contact-header fade-in">
-                <h1>Contact Us</h1>
-                <p>We’d love to hear from you. Reach out anytime for adoption, volunteering, or donations.</p>
+        <div className="container contact-container">
+            <header className="contact-header fade-in page-header">
+                <h1 className="section-title">Contact Us</h1>
+                <p className="section-subtitle">We'd love to hear from you. Reach out anytime for adoption, volunteering, or donations.</p>
             </header>
 
             <div className="contact-content">

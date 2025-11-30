@@ -89,10 +89,10 @@ export default function Donate() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="container">
             <div className="page-header text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900">Make a Donation 💖</h2>
-                <p className="text-gray-600">Your contribution helps us care for pets and find them loving homes</p>
+                <h2 className="section-title">Make a Donation 💖</h2>
+                <p className="section-subtitle">Your contribution helps us care for pets and find them loving homes</p>
             </div>
 
             {/* Pet Specific Donation Card */}

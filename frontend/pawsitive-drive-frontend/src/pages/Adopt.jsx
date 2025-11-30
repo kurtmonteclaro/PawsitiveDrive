@@ -87,10 +87,10 @@ export default function Adopt() {
   if (loading) return <div className="loading">Loading pets…</div>;
 
   return (
-    <div className="adopt-page-container">
+    <div className="container">
       <div className="page-header">
-        <h2>Dogs and Cats Available for Adoption</h2>
-        <p>Find your perfect companion and give them a loving home</p>
+        <h2 className="section-title">Dogs and Cats Available for Adoption</h2>
+        <p className="section-subtitle">Find your perfect companion and give them a loving home</p>
       </div>
 
       {message && <div className="flash">{message}</div>}

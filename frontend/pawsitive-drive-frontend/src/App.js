@@ -18,6 +18,18 @@ function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
+  const getLinkClassName = (path) => {
+    const isActive = location.pathname === path;
+    let className = 'nav-link';
+    if (isActive) {
+      className += path === '/donate' ? ' donation-highlight' : ' active-link';
+    }
+    if (path === '/admin' && role === 'Admin') {
+      className += ' admin-link';
+    }
+    return className;
+  };
+
   return (
       <nav className={`topnav site-header ${isHome ? 'navbar-glass' : ''}`}>
         <Link to="/" className="navbar-brand">
@@ -25,12 +37,12 @@ function Navbar() {
           <span className="brand-text">PAWSITIVE DRIVE</span>
         </Link>
         <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/adopt" className="nav-link">Adopt</Link>
-          <Link to="/donate" className="nav-link donation-highlight">Donate</Link>
-          <Link to="/contact" className="nav-link">Contact</Link>
-          {role === 'Admin' && <Link to="/admin" className="nav-link admin-link">Dashboard</Link>}
+          <Link to="/" className={getLinkClassName('/')}>Home</Link>
+          <Link to="/about" className={getLinkClassName('/about')}>About</Link>
+          <Link to="/adopt" className={getLinkClassName('/adopt')}>Adopt</Link>
+          <Link to="/donate" className={getLinkClassName('/donate')}>Donate</Link>
+          <Link to="/contact" className={getLinkClassName('/contact')}>Contact</Link>
+          {role === 'Admin' && <Link to="/admin" className={getLinkClassName('/admin')}>Dashboard</Link>}
         </div>
         <div className="navbar-auth">
           {!user && <>
@@ -51,10 +63,10 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<div className="container"><About /></div>} />
-            <Route path="/adopt" element={<div className="container"><Adopt /></div>} />
-            <Route path="/donate" element={<div className="container"><Donate /></div>} />
-            <Route path="/contact" element={<div className="container"><Contact /></div>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/adopt" element={<Adopt />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<div className="container"><AdminDashboard /></div>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
