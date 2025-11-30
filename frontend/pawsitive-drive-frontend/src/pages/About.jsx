@@ -3,12 +3,13 @@ import React from 'react';
 export default function About() {
   return (
     <div className="about-page-wrapper">
-      <div className="page-header">
-        <h1>About Pawsitive Drive 🐾</h1>
-        <p className="lead">Every paw deserves love, care, and a chance to live happily.</p>
-      </div>
+      <div className="container">
+        <div className="page-header">
+          <h1 className="section-title">About Pawsitive Drive 🐾</h1>
+          <p className="section-subtitle">Every paw deserves love, care, and a chance to live happily.</p>
+        </div>
 
-      <section className="about-hero py-12 bg-gray-50 border-b border-gray-200">
+        <section className="about-hero py-12 bg-gray-50 border-b border-gray-200">
         <div className="max-w-4xl mx-auto p-6 text-center">
           <h2 className="text-3xl font-extrabold text-indigo-600 mb-4">Our Story</h2>
           <p className="text-lg text-gray-700 leading-relaxed">
@@ -134,6 +135,7 @@ export default function About() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }
