@@ -1,0 +1,86 @@
+/* ===================================================================
+   DONATE PAGE STYLES
+   All styles specific to the Donate component
+   =================================================================== */
+
+/* Donate form container */
+.donate-form {
+  background: var(--white);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Preset amount buttons */
+.donate-form .preset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.donate-form .preset button {
+  padding: 12px 20px;
+  border: 2px solid var(--gray-light);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  color: var(--dark);
+}
+
+.donate-form .preset button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.donate-form .preset button.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: var(--white);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+/* Donate form inputs */
+.donate-form input {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.donate-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(228, 87, 61, 0.1);
+}
+
+/* Donate form submit button */
+.donate-form button[type="submit"] {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+}
+
+.donate-form button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+

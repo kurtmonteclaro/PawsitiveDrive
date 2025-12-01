@@ -1,0 +1,276 @@
+/* ===================================================================
+   ABOUT PAGE STYLES
+   All styles specific to the About component
+   =================================================================== */
+
+/* About page wrapper */
+.about-page-wrapper {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Page header (shared) */
+.page-header {
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.page-header h1,
+.page-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 0 0 12px 0;
+}
+
+.page-header p {
+  font-size: 1.125rem;
+  color: var(--gray);
+  margin: 0;
+}
+
+/* Lead text */
+.lead {
+  font-size: 1.25rem;
+  color: var(--gray);
+  font-weight: 400;
+  margin: 0;
+}
+
+/* About hero section */
+.about-hero {
+  background: linear-gradient(135deg, rgba(228, 87, 61, 0.05), rgba(74, 144, 226, 0.05));
+  padding: 48px;
+  border-radius: var(--radius);
+  margin: 32px 0;
+}
+
+.about-hero-content h2 {
+  font-size: 2rem;
+  color: var(--dark);
+  margin: 0 0 16px 0;
+}
+
+.about-hero-content p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #495057;
+  margin: 0;
+}
+
+/* About mission section */
+.about-mission {
+  margin: 48px 0;
+}
+
+.mission-card {
+  background: var(--white);
+  padding: 48px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mission-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.mission-card h2 {
+  font-size: 2rem;
+  color: var(--dark);
+  margin: 0 0 16px 0;
+}
+
+.mission-card p {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #495057;
+  margin: 0;
+}
+
+/* About gallery section */
+.about-gallery {
+  margin: 48px 0;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  aspect-ratio: 4/3;
+}
+
+.gallery-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.gallery-item:hover .gallery-image {
+  transform: scale(1.05);
+}
+
+.gallery-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  color: var(--white);
+  padding: 24px;
+  transform: translateY(100%);
+  transition: var(--transition);
+}
+
+.gallery-item:hover .gallery-overlay {
+  transform: translateY(0);
+}
+
+.gallery-overlay p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* About values section */
+.about-values {
+  margin: 64px 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.value-card {
+  background: var(--white);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.value-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.value-card h3 {
+  font-size: 1.5rem;
+  color: var(--dark);
+  margin: 0 0 12px 0;
+}
+
+.value-card p {
+  color: #495057;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* About CTA section */
+.about-cta {
+  margin: 64px 0;
+}
+
+.cta-card {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  padding: 64px 48px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+  color: var(--white);
+}
+
+.cta-card h2 {
+  font-size: 2.5rem;
+  margin: 0 0 16px 0;
+  color: var(--white);
+}
+
+.cta-card p {
+  font-size: 1.25rem;
+  margin: 0 0 32px 0;
+  opacity: 0.95;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-buttons .btn {
+  min-width: 180px;
+}
+
+/* Section title */
+.section-title {
+  font-size: 2rem;
+  color: var(--dark);
+  text-align: center;
+  margin: 48px 0 8px 0;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: var(--gray);
+  font-size: 1.125rem;
+  margin-bottom: 32px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .about-hero,
+  .mission-card {
+    padding: 32px 24px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-card {
+    padding: 48px 24px;
+  }
+
+  .cta-card h2 {
+    font-size: 2rem;
+  }
+
+  .page-header h1,
+  .page-header h2 {
+    font-size: 1.75rem;
+  }
+}
+

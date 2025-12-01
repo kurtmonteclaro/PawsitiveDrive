@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; 
 import { useLocation } from 'react-router-dom';
+import "./Donate.css";
 
 export default function Donate() {
     // Default starting amount, using 500 as the user's initial state

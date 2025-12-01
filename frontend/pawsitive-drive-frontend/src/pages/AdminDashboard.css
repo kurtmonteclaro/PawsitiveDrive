@@ -1,0 +1,342 @@
+/* ===================================================================
+   ADMIN DASHBOARD STYLES
+   All styles specific to the AdminDashboard component
+   =================================================================== */
+
+/* Admin toolbar */
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.admin-toolbar .note {
+  color: var(--gray);
+  font-size: 0.875rem;
+  padding: 8px 16px;
+  background: var(--gray-light);
+  border-radius: var(--radius-sm);
+}
+
+/* Admin pets table */
+.admin-pets-table {
+  margin-top: 2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 30px 50px -20px rgba(15, 23, 42, 0.25);
+  background: #fff;
+  overflow: hidden;
+}
+
+.admin-pets-header {
+  display: grid;
+  grid-template-columns: 120px 140px 150px 130px 1fr 140px 100px;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+  background: linear-gradient(90deg, #f9fafb, #eef2ff);
+}
+
+.admin-pets-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-pets-row {
+  display: grid;
+  grid-template-columns: 120px 140px 150px 130px 1fr 140px 100px;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  align-items: center;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-pets-row:hover {
+  background: #fdfcff;
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.07);
+}
+
+.admin-pets-empty {
+  padding: 4rem 1.5rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.pet-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(15, 23, 42, 0.15);
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pet-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pet-thumb .no-img,
+.no-img {
+  width: 100%;
+  height: 100%;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pet-name p {
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.pet-name small {
+  color: #9ca3af;
+}
+
+.pet-type span {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pet-type small {
+  display: block;
+  color: #6b7280;
+}
+
+.pet-age {
+  font-weight: 600;
+  color: #374151;
+}
+
+.pet-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.pet-status select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.pet-status select:focus {
+  outline: 2px solid rgba(99, 102, 241, 0.4);
+  outline-offset: 2px;
+}
+
+.status-available select {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.status-pending select {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+.status-adopted select {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+
+.pet-actions button {
+  color: #ef4444;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pet-actions button:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+}
+
+/* Pet form */
+.pet-form {
+  background: var(--white);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pet-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 0.9375rem;
+}
+
+.pet-form input,
+.pet-form textarea,
+.pet-form select {
+  display: block;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 2px solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.pet-form input:focus,
+.pet-form textarea:focus,
+.pet-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(228, 87, 61, 0.1);
+}
+
+.pet-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.pet-form button[type="submit"] {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--transition);
+  box-shadow: var(--shadow-md);
+}
+
+.pet-form button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Image Preview */
+.image-preview {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed var(--gray-light);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background: var(--light);
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.image-preview-placeholder {
+  color: var(--gray);
+  text-align: center;
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .admin-pets-header,
+  .admin-pets-row {
+    grid-template-columns: 80px 140px 1fr 1fr;
+    grid-template-areas:
+      "image name name actions"
+      "image type age status"
+      "description description description description";
+  }
+
+  .admin-pets-header span:nth-child(1),
+  .admin-pets-row .pet-thumb {
+    grid-area: image;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-pets-header {
+    display: none;
+  }
+
+  .admin-pets-row {
+    grid-template-columns: 80px 1fr;
+    grid-template-areas:
+      "image name"
+      "image type"
+      "description description"
+      "age status"
+      "actions actions";
+    padding: 1rem;
+  }
+
+  .pet-thumb {
+    grid-area: image;
+  }
+
+  .pet-name {
+    grid-area: name;
+  }
+
+  .pet-type {
+    grid-area: type;
+  }
+
+  .pet-age {
+    grid-area: age;
+  }
+
+  .pet-description {
+    grid-area: description;
+  }
+
+  .pet-status {
+    grid-area: status;
+  }
+
+  .pet-actions {
+    grid-area: actions;
+    justify-content: flex-end;
+  }
+}
+

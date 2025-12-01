@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
+import "./Adopt.css";
 
 const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 

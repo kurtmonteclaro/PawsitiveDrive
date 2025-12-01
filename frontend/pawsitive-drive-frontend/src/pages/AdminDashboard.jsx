@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useUserRole } from '../context/UserRoleContext'; // Ensure path is correct
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
+import "./AdminDashboard.css";
 
 const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 

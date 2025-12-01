@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import "./Home.css";
 
 export default function Home() {
   const [featuredPets, setFeaturedPets] = useState([]);
@@ -153,7 +154,7 @@ export default function Home() {
 
       {/* ================= WHY ADOPT WITH US ================= */}
       <section className="section features reveal">
-        <div className="section-inner blob">
+        <div className="section-inner">
           <h2 className="section-title">Why Adopt With Pawsitive Drive?</h2>
           <div className="features-grid">
             <div className="feature-box">
