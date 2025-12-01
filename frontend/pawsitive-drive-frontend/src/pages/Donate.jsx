@@ -91,7 +91,7 @@ export default function Donate() {
     return (
         <div className="container">
             <div className="page-header text-center mb-8">
-                <h2 className="section-title">Make a Donation 💖</h2>
+                <h2 className="section-title">Make a Donation</h2>
                 <p className="section-subtitle">Your contribution helps us care for pets and find them loving homes</p>
             </div>
 
@@ -105,7 +105,10 @@ export default function Donate() {
                                 src={pet.image_url} 
                                 alt={pet.name}
                                 className="w-24 h-24 object-cover rounded-xl"
-                                onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '🐾'; }}
+                                onError={(e) => { 
+                                  e.target.style.display = 'none'; 
+                                  e.target.parentElement.innerHTML = 'No image';
+                                }}
                             />
                         </div>
                         
@@ -169,7 +172,6 @@ export default function Donate() {
             {status && (
                 <div className={`p-4 rounded-lg font-medium text-center mt-6 max-w-lg mx-auto 
                     ${status.includes('Thank you') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {status.includes('Thank you') ? '✅ ' : '❌ '}
                     {status}
                 </div>
             )}
