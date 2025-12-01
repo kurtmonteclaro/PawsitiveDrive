@@ -5,8 +5,8 @@ export default function About() {
     <div className="about-page-wrapper">
       <div className="container">
         <div className="page-header">
-          <h1 className="section-title">About Pawsitive Drive 🐾</h1>
-          <p className="section-subtitle">Every paw deserves love, care, and a chance to live happily.</p>
+          <h1 className="section-title">About Pawsitive Drive</h1>
+          <p className="section-subtitle">Learn more about who we are and how we care for animals in need.</p>
         </div>
 
         <section className="about-hero py-12 bg-gray-50 border-b border-gray-200">
@@ -23,7 +23,6 @@ export default function About() {
       <section className="about-mission py-16 bg-white">
         <div className="max-w-3xl mx-auto p-6">
           <div className="bg-indigo-50 p-8 rounded-xl shadow-2xl text-center border-t-4 border-indigo-600">
-            <div className="text-4xl mb-4">🎯</div>
             <h2 className="text-3xl font-bold text-gray-800 mb-3">Our Mission</h2>
             <p className="text-lg text-gray-600 leading-relaxed">
               To go beyond temporary relief and create a lasting impact in the lives of stray animals. 
@@ -95,25 +94,21 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 values-grid">
             
             <div className="p-6 bg-yellow-50 rounded-lg shadow-md border-t-4 border-yellow-500 value-card">
-              <div className="text-3xl mb-3">❤️</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Compassion</h3>
               <p className="text-gray-600 text-sm">We treat every animal with the respect and kindness they deserve, recognizing their unique personalities and needs.</p>
             </div>
             
             <div className="p-6 bg-blue-50 rounded-lg shadow-md border-t-4 border-blue-500 value-card">
-              <div className="text-3xl mb-3">🤝</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Community</h3>
               <p className="text-gray-600 text-sm">We believe in the power of community to create positive change and bring people together for a common cause.</p>
             </div>
             
             <div className="p-6 bg-green-50 rounded-lg shadow-md border-t-4 border-green-500 value-card">
-              <div className="text-3xl mb-3">🌟</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Excellence</h3>
               <p className="text-gray-600 text-sm">We maintain high standards in animal care, ensuring the best possible outcomes for every pet in our program.</p>
             </div>
 
             <div className="p-6 bg-purple-50 rounded-lg shadow-md border-t-4 border-purple-500 value-card">
-              <div className="text-3xl mb-3">🔒</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Transparency</h3>
               <p className="text-gray-600 text-sm">We operate with honesty and openness, keeping our supporters informed about how their contributions make a difference.</p>
             </div>

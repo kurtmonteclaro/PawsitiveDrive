@@ -38,8 +38,10 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   color: var(--dark);
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--white);
   min-height: 100vh;
+  /* Offset for fixed navbar so page content isn't hidden */
+  padding-top: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -50,11 +52,13 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 48px;
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.95);
   box-shadow: var(--shadow-sm);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  z-index: 1100;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   max-width: 100vw;
@@ -229,13 +233,14 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 48px;
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-sm);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  backdrop-filter: blur(10px);
 }
 
 .site-header.scrolled {
@@ -354,6 +359,8 @@ body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+  /* Soft gradient background specifically for the homepage sections */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 60%, #d6e0f2 100%);
 }
 
 /* Footer */
@@ -363,7 +370,8 @@ body {
   text-align: center;
   color: var(--gray);
   background: var(--white);
-  margin-top: 48px;
+  /* Remove extra gap above the footer so colors blend cleanly */
+  margin-top: 0;
 }
 
 /* Grid */

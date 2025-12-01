@@ -238,7 +238,7 @@ export default function Home() {
 
       {/* ================= GET INVOLVED ================= */}
       <section className="section involved reveal">
-        <div className="section-inner blob">
+        <div className="section-inner">
           <h2 className="section-title">Get Involved</h2>
           <p className="section-subtitle">There are many ways you can help save lives.</p>
           <div className="involved-grid">
