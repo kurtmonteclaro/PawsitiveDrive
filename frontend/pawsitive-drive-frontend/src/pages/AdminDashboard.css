@@ -21,6 +21,51 @@
   border-radius: var(--radius-sm);
 }
 
+/* Status filter pills */
+.filters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.filters-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.filters-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+  background: #f3f4f6;
+  border-radius: 999px;
+}
+
+.filter-pill {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #4b5563;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.filter-pill:hover {
+  background: #e5e7eb;
+}
+
+.filter-pill.active {
+  background: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+}
+
 /* Admin pets table */
 .admin-pets-table {
   margin-top: 2rem;

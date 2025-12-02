@@ -184,18 +184,22 @@ export default function AdminDashboard() {
 
             {/* Admin Toolbar */}
             <div className="flex justify-between items-center mb-6 admin-toolbar">
-                <div className="flex items-center space-x-3 filters">
-                    <label className="font-semibold text-gray-700">Filter by Status:</label>
-                    <select 
-                        value={filter} 
-                        onChange={(e) => setFilter(e.target.value)}
-                        className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                        <option>All</option>
-                        <option>Available</option>
-                        <option>Pending</option>
-                        <option>Adopted</option>
-                    </select>
+                <div className="filters">
+                    <span className="filters-label">Filter by status:</span>
+                    <div className="filters-pills" role="tablist" aria-label="Filter pets by status">
+                        {['All', 'Available', 'Pending', 'Adopted'].map((status) => (
+                            <button
+                                key={status}
+                                type="button"
+                                className={`filter-pill ${filter === status ? 'active' : ''}`}
+                                onClick={() => setFilter(status)}
+                                role="tab"
+                                aria-selected={filter === status}
+                            >
+                                {status}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <button className="btn bg-indigo-600 text-white hover:bg-indigo-700 py-2 px-4 rounded-lg accent" onClick={() => {
                     setFormData(initialFormData); // Clear form data on open
