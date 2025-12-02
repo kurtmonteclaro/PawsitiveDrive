@@ -191,6 +191,64 @@ body {
   gap: 12px;
 }
 
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  text-decoration: none;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  background: var(--gray-light);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.navbar-profile-picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.navbar-profile-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 0;
+}
+
+.profile-link:hover .navbar-profile-icon {
+  color: var(--accent);
+}
+
+.profile-link.active-link {
+  border-color: var(--accent);
+  background: rgba(228, 87, 61, 0.1);
+}
+
+.profile-link.active-link .navbar-profile-icon {
+  color: var(--accent);
+}
+
 .auth-btn {
   padding: 10px 22px;
   border: none;
@@ -860,6 +918,16 @@ body {
   .auth-btn {
     padding: 8px 14px;
     font-size: 0.8rem;
+  }
+
+  .profile-link {
+    width: 36px;
+    height: 36px;
+  }
+
+  .navbar-profile-icon {
+    width: 20px;
+    height: 20px;
   }
 
   .brand-text {
