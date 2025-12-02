@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
 import "../App.css";
@@ -22,6 +22,16 @@ export default function Signup() {
   const [role, setRole] = useState('Donor');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Prevent page scrolling while on the signup screen
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
