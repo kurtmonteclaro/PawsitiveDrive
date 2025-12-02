@@ -53,6 +53,28 @@ public class FileStorageService {
                 .toUriString();
     }
 
+    public boolean deleteFile(String filename) {
+        if (filename == null || filename.isEmpty()) {
+            return false;
+        }
+        try {
+            Path filePath = uploadDir.resolve(filename);
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.err.println("Failed to delete file: " + filename + " - " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteFileByUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return false;
+        }
+        // Extract filename from URL (e.g., "http://localhost:8080/uploads/abc123.jpg" -> "abc123.jpg")
+        String filename = url.substring(url.lastIndexOf('/') + 1);
+        return deleteFile(filename);
+    }
+
     public Path getUploadDir() {
         return uploadDir;
     }

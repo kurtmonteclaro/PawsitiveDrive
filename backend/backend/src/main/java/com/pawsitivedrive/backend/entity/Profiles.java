@@ -1,5 +1,6 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class Profiles {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"profiles", "donations", "password"})
     private Users user;
 
     // Getters and Setters
