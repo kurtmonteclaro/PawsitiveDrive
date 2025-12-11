@@ -1,15 +1,265 @@
 /* ===================================================================
-   ADOPT PAGE STYLES
-   All styles specific to the Adopt component
+   ADOPT PAGE STYLES - Enhanced Card Design
+   Modern, visually appealing adoption cards with improved spacing and typography
    =================================================================== */
 
-/* This file can be extended if needed for Adopt-specific styles */
-/* Currently, Adopt page uses mostly shared card and grid styles from App.css */
-
-/* If you need adopt-specific overrides, add them here */
-/* For example:
-.adopt-container {
-  Custom styles
+/* Adoption Card Container */
+.adopt-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
-*/
 
+.adopt-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Image Wrapper */
+.adopt-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.adopt-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.adopt-card:hover .adopt-card-image {
+  transform: scale(1.05);
+}
+
+.adopt-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Status Badge */
+.adopt-card-status-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.status-badge.available {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+}
+
+.status-badge.pending {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+}
+
+.status-badge.adopted {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: #ffffff;
+}
+
+/* Card Body */
+.adopt-card-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card Header */
+.adopt-card-header {
+  margin-bottom: 4px;
+}
+
+.adopt-card-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Attributes */
+.adopt-card-attributes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.attribute-item {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.attribute-item strong {
+  font-weight: 600;
+  color: #374151;
+}
+
+.attribute-separator {
+  color: #d1d5db;
+  font-weight: 300;
+}
+
+/* Description */
+.adopt-card-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: #4b5563;
+  line-height: 1.6;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Action Buttons */
+.adopt-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.adopt-btn,
+.donate-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.adopt-btn {
+  background: linear-gradient(135deg, #e4573d 0%, #ff6b52 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(228, 87, 61, 0.3);
+}
+
+.adopt-btn:hover {
+  background: linear-gradient(135deg, #c94a35 0%, #e4573d 100%);
+  box-shadow: 0 6px 20px rgba(228, 87, 61, 0.4);
+  transform: translateY(-2px);
+}
+
+.adopt-btn:active {
+  transform: translateY(0);
+}
+
+.donate-btn {
+  background: linear-gradient(135deg, #4a90e2 0%, #6ba3e8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.donate-btn:hover {
+  background: linear-gradient(135deg, #357abd 0%, #4a90e2 100%);
+  box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  transform: translateY(-2px);
+}
+
+.donate-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .adopt-card-image-wrapper {
+    height: 240px;
+  }
+
+  .adopt-card-body {
+    padding: 20px;
+  }
+
+  .adopt-card-name {
+    font-size: 1.375rem;
+  }
+
+  .adopt-card-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .adopt-btn,
+  .donate-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .adopt-card-image-wrapper {
+    height: 220px;
+  }
+
+  .adopt-card-body {
+    padding: 18px;
+    gap: 10px;
+  }
+
+  .adopt-card-name {
+    font-size: 1.25rem;
+  }
+
+  .adopt-card-attributes {
+    font-size: 0.8125rem;
+  }
+
+  .adopt-card-description {
+    font-size: 0.875rem;
+  }
+}

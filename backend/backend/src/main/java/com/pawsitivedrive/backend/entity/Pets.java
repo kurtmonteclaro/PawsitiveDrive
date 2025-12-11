@@ -1,5 +1,7 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,9 +26,11 @@ public class Pets {
 
     @ManyToOne
     @JoinColumn(name = "added_by", nullable = false)
+    @JsonIgnoreProperties({"profiles", "donations", "password", "applications"})
     private Users addedBy;
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL)
+    @JsonIgnore // Ignore applications to prevent circular reference
     private List<AdoptionApplications> applications;
 
     // Getters and Setters
