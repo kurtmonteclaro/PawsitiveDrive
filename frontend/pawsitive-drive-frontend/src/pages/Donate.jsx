@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import "./Donate.css";
 
+const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
+
 export default function Donate() {
     // Default starting amount, using 500 as the user's initial state
     const [amount, setAmount] = useState(500);
@@ -21,7 +23,7 @@ export default function Donate() {
         
         if (petId) {
             // Load pet details
-            axios.get(`/api/pets/${petId}`)
+            axios.get(`${API_ROOT}/pets/${petId}`)
                 .then(res => setPet(res.data))
                 .catch(err => {
                     console.error('Failed to load pet:', err);
@@ -54,18 +56,25 @@ export default function Donate() {
                 // Fetch full user object to ensure entity mapping works on backend
                 const userId = user.user_id || user.id;
                 if (userId) {
-                    const userRes = await axios.get(`/api/users/${userId}`);
+                    const userRes = await axios.get(`${API_ROOT}/users/${userId}`);
                     donationData.user = userRes.data;
                 }
             }
 
-            // 2. If donating to a specific pet, include pet reference
-            if (pet) {
-                donationData.pet = pet;
+            // 2. If donating to a specific pet, fetch full pet object and include pet reference
+            if (pet && pet.pet_id) {
+                try {
+                    const petRes = await axios.get(`${API_ROOT}/pets/${pet.pet_id}`);
+                    donationData.pet = petRes.data;
+                } catch (err) {
+                    console.error('Failed to fetch full pet object:', err);
+                    // Use the pet data we already have
+                    donationData.pet = pet;
+                }
             }
 
             // 3. Post donation data
-            const res = await axios.post('/api/donations', donationData);
+            const res = await axios.post(`${API_ROOT}/donations`, donationData);
             
             if (res.status === 201 || res.status === 200) {
                 setStatus(`Thank you for your donation of ₱${amount.toLocaleString()}! ${pet ? `Your contribution will help ${pet.name} find a loving home.` : 'Your generosity is highly appreciated!'}`);

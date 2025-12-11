@@ -21,6 +21,10 @@ public class Donations {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
+    @ManyToOne
+    @JoinColumn(name = "pet_id", nullable = true)
+    private Pets pet;
+
     @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL)
     private List<DonationHistory> histories;
 
@@ -81,5 +85,13 @@ public class Donations {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public Pets getPet() {
+        return pet;
+    }
+
+    public void setPet(Pets pet) {
+        this.pet = pet;
     }
 }
