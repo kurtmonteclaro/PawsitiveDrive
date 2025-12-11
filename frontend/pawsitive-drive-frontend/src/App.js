@@ -11,6 +11,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
 import { UserRoleProvider, useUserRole } from './context/UserRoleContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DonationProvider } from './context/DonationContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { useLocation } from 'react-router-dom';
@@ -60,7 +61,7 @@ function Navbar() {
     } else {
       setProfilePicture(null);
     }
-  }, [user, location.pathname]); // Reload when navigating to profile page
+  }, [user, location.pathname]); 
 
   const getLinkClassName = (path) => {
     const isActive = location.pathname === path;
@@ -149,19 +150,21 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <UserRoleProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/adopt" element={<Adopt />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<div className="container"><AdminDashboard /></div>} />
-            <Route path="/profile" element={<div className="container"><Profile /></div>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Routes>
-          <footer className="footer">© {new Date().getFullYear()} Pawsitive Drive</footer>
+          <DonationProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/adopt" element={<Adopt />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/admin" element={<div className="container"><AdminDashboard /></div>} />
+              <Route path="/profile" element={<div className="container"><Profile /></div>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Routes>
+            <footer className="footer">© {new Date().getFullYear()} Pawsitive Drive</footer>
+          </DonationProvider>
         </UserRoleProvider>
       </AuthProvider>
     </BrowserRouter>
