@@ -1085,6 +1085,231 @@
   }
 }
 
+/* ===================================================================
+   PETS STATISTICS CARDS AND MODALS
+   =================================================================== */
+
+/* Statistics Cards Grid */
+.pets-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.pets-stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.pets-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pets-stat-card:hover::before {
+  opacity: 1;
+}
+
+.pets-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(79, 70, 229, 0.2);
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.pets-stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.pets-stat-icon-total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.pets-stat-icon-available {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.pets-stat-icon-pending {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.pets-stat-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.pets-stat-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pets-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1;
+}
+
+.pets-stat-arrow {
+  font-size: 1.5rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.pets-stat-card:hover .pets-stat-arrow {
+  color: #4f46e5;
+  transform: translateX(4px);
+}
+
+/* Pets Modal */
+.pets-modal {
+  margin: 2rem auto;
+}
+
+.pets-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.pets-modal-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.pets-modal-card:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+  transform: translateY(-2px);
+}
+
+.pets-modal-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pets-modal-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pets-modal-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #f3f4f6;
+}
+
+.pets-modal-info {
+  padding: 1.25rem;
+}
+
+.pets-modal-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.pets-modal-details {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0;
+}
+
+.pets-modal-status {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  margin: 0.75rem 0;
+}
+
+.pets-modal-status.status-available {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.pets-modal-status.status-pending {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.pets-modal-status.status-adopted {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.pets-modal-description {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0.75rem 0 0 0;
+}
+
+/* Responsive Statistics Cards */
+@media (max-width: 768px) {
+  .pets-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pets-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Pagination Styles for Admin Dashboard */
 .pagination {
   display: flex;
