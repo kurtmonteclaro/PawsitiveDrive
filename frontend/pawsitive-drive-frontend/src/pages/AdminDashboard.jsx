@@ -246,7 +246,7 @@ export default function AdminDashboard() {
         if (isAdmin && activeTab === 'history') {
             loadHistory();
         }
-    }, [isAdmin, activeTab]); // Removed loadHistory from deps to avoid infinite loop
+    }, [isAdmin, activeTab, loadHistory]);
 
     const filteredPets = useMemo(() => {
         // Ensure pets is always an array

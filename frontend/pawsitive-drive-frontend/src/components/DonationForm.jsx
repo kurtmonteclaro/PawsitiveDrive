@@ -112,7 +112,7 @@ export default function DonationForm() {
       }
 
       // Save donation to database
-      const response = await axios.post(`${API_ROOT}/donations`, donationData);
+      await axios.post(`${API_ROOT}/donations`, donationData);
       
       // Update local donation total
       addDonation(amountNumber);
