@@ -33,6 +33,7 @@ export default function AdminDashboard() {
     const [formLoading, setFormLoading] = useState(false); // Loading state for form submission
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadError, setUploadError] = useState('');
+    const [modalType, setModalType] = useState(null); // 'total', 'available', 'pending', or null
 
     // Initial state for new pet creation/editing
     const initialFormData = {
@@ -256,6 +257,31 @@ export default function AdminDashboard() {
         if (filter === 'All') return petsArray;
         return petsArray.filter(p => (p.status || '').toLowerCase() === filter.toLowerCase());
     }, [pets, filter]);
+
+    // Calculate statistics
+    const petsStats = useMemo(() => {
+        const petsArray = Array.isArray(pets) ? pets : [];
+        return {
+            total: petsArray.length,
+            available: petsArray.filter(p => (p.status || '').toLowerCase() === 'available').length,
+            pending: petsArray.filter(p => (p.status || '').toLowerCase() === 'pending').length
+        };
+    }, [pets]);
+
+    // Get pets for modal based on type
+    const getModalPets = () => {
+        const petsArray = Array.isArray(pets) ? pets : [];
+        switch (modalType) {
+            case 'total':
+                return petsArray;
+            case 'available':
+                return petsArray.filter(p => (p.status || '').toLowerCase() === 'available');
+            case 'pending':
+                return petsArray.filter(p => (p.status || '').toLowerCase() === 'pending');
+            default:
+                return [];
+        }
+    };
 
     // Calculate pagination for pets
     const petsTotalPages = Math.ceil(filteredPets.length / petsItemsPerPage);
@@ -596,6 +622,48 @@ export default function AdminDashboard() {
             {/* Pets Management Tab */}
             {activeTab === 'pets' && (
                 <>
+                    {/* Statistics Cards */}
+                    <div className="pets-stats-grid mb-6">
+                        <div className="pets-stat-card" onClick={() => setModalType('total')}>
+                            <div className="pets-stat-icon pets-stat-icon-total">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div className="pets-stat-content">
+                                <h3 className="pets-stat-label">Total Pets</h3>
+                                <p className="pets-stat-value">{petsStats.total}</p>
+                            </div>
+                            <div className="pets-stat-arrow">→</div>
+                        </div>
+                        <div className="pets-stat-card" onClick={() => setModalType('available')}>
+                            <div className="pets-stat-icon pets-stat-icon-available">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div className="pets-stat-content">
+                                <h3 className="pets-stat-label">Available Pets</h3>
+                                <p className="pets-stat-value">{petsStats.available}</p>
+                            </div>
+                            <div className="pets-stat-arrow">→</div>
+                        </div>
+                        <div className="pets-stat-card" onClick={() => setModalType('pending')}>
+                            <div className="pets-stat-icon pets-stat-icon-pending">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div className="pets-stat-content">
+                                <h3 className="pets-stat-label">Pending Pets</h3>
+                                <p className="pets-stat-value">{petsStats.pending}</p>
+                            </div>
+                            <div className="pets-stat-arrow">→</div>
+                        </div>
+                    </div>
+
                     {/* Admin Toolbar */}
                     <div className="flex justify-between items-center mb-6 admin-toolbar">
                         <div className="filters">
@@ -819,7 +887,73 @@ export default function AdminDashboard() {
                         </button>
                     </div>
                 )}
-            </div>
+                    </div>
+
+                    {/* Pet Statistics Modals */}
+                    {modalType && (
+                        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-overlay z-50 flex items-center justify-center" onClick={() => setModalType(null)}>
+                            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] modal pets-modal" onClick={(e) => e.stopPropagation()}>
+                                <div className="flex justify-between items-center p-6 border-b border-gray-200 modal-header">
+                                    <h2 className="text-2xl font-bold text-gray-800">
+                                        {modalType === 'total' && 'Total Pets'}
+                                        {modalType === 'available' && 'Available Pets'}
+                                        {modalType === 'pending' && 'Pending Pets'}
+                                        <span className="ml-3 text-lg font-normal text-gray-500">
+                                            ({getModalPets().length})
+                                        </span>
+                                    </h2>
+                                    <button className="text-gray-500 hover:text-gray-800 text-3xl modal-close" onClick={() => setModalType(null)}>&times;</button>
+                                </div>
+                                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                                    {getModalPets().length === 0 ? (
+                                        <div className="text-center py-12 text-gray-500">
+                                            <p className="text-lg">No pets found in this category.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="pets-modal-grid">
+                                            {getModalPets().map((pet) => (
+                                                <div key={pet.pet_id} className="pets-modal-card">
+                                                    <div className="pets-modal-image">
+                                                        {pet.image_url ? (
+                                                            <img
+                                                                src={pet.image_url}
+                                                                alt={pet.name}
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.parentElement.innerHTML = '<div class="pets-modal-placeholder">No Image</div>';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div className="pets-modal-placeholder">No Image</div>
+                                                        )}
+                                                    </div>
+                                                    <div className="pets-modal-info">
+                                                        <h3 className="pets-modal-name">{pet.name}</h3>
+                                                        <p className="pets-modal-details">
+                                                            <span>{pet.species}</span> • <span>{pet.breed}</span>
+                                                        </p>
+                                                        <p className="pets-modal-details">
+                                                            {pet.age} years • {pet.gender}
+                                                        </p>
+                                                        <div className={`pets-modal-status status-${String(pet.status || '').toLowerCase()}`}>
+                                                            {pet.status || 'N/A'}
+                                                        </div>
+                                                        {pet.description && (
+                                                            <p className="pets-modal-description">
+                                                                {pet.description.length > 100 
+                                                                    ? `${pet.description.slice(0, 100)}...` 
+                                                                    : pet.description}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </>
             )}
 
