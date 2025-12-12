@@ -19,11 +19,13 @@ export default function AdminDashboard() {
 
     const [pets, setPets] = useState([]);
     const [applications, setApplications] = useState([]);
+    const [donations, setDonations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [applicationsLoading, setApplicationsLoading] = useState(true);
+    const [historyLoading, setHistoryLoading] = useState(false);
     const [filter, setFilter] = useState('All');
     const [appFilter, setAppFilter] = useState('Pending'); // Filter for applications
-    const [activeTab, setActiveTab] = useState('pets'); // 'pets' or 'applications'
+    const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'applications', or 'history'
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [formLoading, setFormLoading] = useState(false); // Loading state for form submission
@@ -207,6 +209,29 @@ export default function AdminDashboard() {
         }
     }, [activeTab, message]);
 
+    const loadHistory = useCallback(async () => {
+        try {
+            setHistoryLoading(true);
+            const [donationsRes, adoptionsRes] = await Promise.all([
+                axios.get(`${API_ROOT}/donations`),
+                axios.get(`${API_ROOT}/applications`)
+            ]);
+            console.log('Donations response:', donationsRes.data);
+            console.log('Donations count:', Array.isArray(donationsRes.data) ? donationsRes.data.length : 'Not an array');
+            const donationsData = Array.isArray(donationsRes.data) ? donationsRes.data : [];
+            setDonations(donationsData);
+            const applicationsData = Array.isArray(adoptionsRes.data) ? adoptionsRes.data : [];
+            setApplications(applicationsData);
+        } catch (err) {
+            console.error('Failed to load history:', err);
+            console.error('Error response:', err.response?.data);
+            setDonations([]);
+            setApplications([]);
+        } finally {
+            setHistoryLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (isAdmin) {
             loadPets();
@@ -216,6 +241,12 @@ export default function AdminDashboard() {
             setApplicationsLoading(false);
         }
     }, [isAdmin, loadPets, loadApplications]);
+
+    useEffect(() => {
+        if (isAdmin && activeTab === 'history') {
+            loadHistory();
+        }
+    }, [isAdmin, activeTab]); // Removed loadHistory from deps to avoid infinite loop
 
     const filteredPets = useMemo(() => {
         // Ensure pets is always an array
@@ -456,6 +487,10 @@ export default function AdminDashboard() {
             setMessage(`Application ${status.toLowerCase()} successfully!`);
             loadApplications(); // Reload applications
             loadPets(); // Reload pets in case status changed
+            // If on history tab, reload history to show updated status
+            if (activeTab === 'history') {
+                loadHistory();
+            }
             setTimeout(() => setMessage(''), 3000);
         } catch (err) {
             console.error('Failed to update application:', err);
@@ -506,6 +541,20 @@ export default function AdminDashboard() {
                                 {applications.filter(app => app.status === 'Pending').length}
                             </span>
                         )}
+                    </button>
+                    <button
+                        onClick={() => {
+                            setActiveTab('history');
+                            setMessage(''); // Clear messages when switching tabs
+                            // Reload history when switching to history tab
+                            loadHistory();
+                        }}
+                        className={`admin-tab ${activeTab === 'history' ? 'active' : ''}`}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>History</span>
                     </button>
                 </nav>
             </div>
@@ -831,6 +880,161 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
                                     ))
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+
+            {/* History Tab */}
+            {activeTab === 'history' && (
+                <>
+                    {historyLoading ? (
+                        <div className="text-center py-16 text-xl text-gray-500">Loading history…</div>
+                    ) : (
+                        <div className="admin-history-container">
+                            <div className="admin-history-section">
+                                <h3 className="admin-history-title">All Donations</h3>
+                                {donations.length === 0 ? (
+                                    <div className="admin-history-empty">
+                                        No donations found.
+                                    </div>
+                                ) : (
+                                    <div className="admin-history-table">
+                                        <div className="admin-history-header">
+                                            <span>User</span>
+                                            <span>Amount</span>
+                                            <span>Pet</span>
+                                            <span>Payment Method</span>
+                                            <span>Date</span>
+                                            <span>Status</span>
+                                        </div>
+                                        <div className="admin-history-body">
+                                            {donations.map((donation) => (
+                                                <div key={donation.donation_id} className="admin-history-row">
+                                                    <div className="history-user">
+                                                        <p className="history-user-name">{donation.user?.name || 'Unknown User'}</p>
+                                                        <small className="history-user-email">{donation.user?.email || 'N/A'}</small>
+                                                    </div>
+                                                    <div className="history-amount">
+                                                        ₱{donation.amount?.toFixed(2) || '0.00'}
+                                                    </div>
+                                                    <div className="history-pet">
+                                                        {donation.pet ? (
+                                                            <>
+                                                                {donation.pet.image_url && (
+                                                                    <img
+                                                                        src={donation.pet.image_url}
+                                                                        alt={donation.pet.name}
+                                                                        className="history-pet-image"
+                                                                        onError={(e) => {
+                                                                            e.target.style.display = 'none';
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                <span>{donation.pet.name || 'N/A'}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="history-no-pet">General Donation</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="history-method">
+                                                        {donation.payment_method || 'N/A'}
+                                                    </div>
+                                                    <div className="history-date">
+                                                        {donation.donation_date
+                                                            ? new Date(donation.donation_date).toLocaleString('en-US', {
+                                                                  year: 'numeric',
+                                                                  month: 'short',
+                                                                  day: 'numeric',
+                                                                  hour: '2-digit',
+                                                                  minute: '2-digit',
+                                                                  hour12: true
+                                                              })
+                                                            : 'N/A'}
+                                                    </div>
+                                                    <div className={`history-status status-${(donation.status || 'pending').toLowerCase()}`}>
+                                                        <span className="status-badge">{donation.status || 'Pending'}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="admin-history-section">
+                                <h3 className="admin-history-title">All Adoptions</h3>
+                                {applications.length === 0 ? (
+                                    <div className="admin-history-empty">
+                                        No adoption applications found.
+                                    </div>
+                                ) : (
+                                    <div className="admin-history-table">
+                                        <div className="admin-history-header">
+                                            <span>Pet</span>
+                                            <span>Applicant</span>
+                                            <span>Application Date</span>
+                                            <span>Status</span>
+                                            <span>Reviewed By</span>
+                                        </div>
+                                        <div className="admin-history-body">
+                                            {applications.map((app) => (
+                                                <div key={app.application_id} className="admin-history-row">
+                                                    <div className="history-pet">
+                                                        {app.pet?.image_url && (
+                                                            <img
+                                                                src={app.pet.image_url}
+                                                                alt={app.pet.name || 'Pet'}
+                                                                className="history-pet-image"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        )}
+                                                        <div className="history-pet-info">
+                                                            <span className="history-pet-name">{app.pet?.name || 'Unknown Pet'}</span>
+                                                            <small className="history-pet-details">
+                                                                {app.pet?.breed || 'N/A'} • {app.pet?.age || 'N/A'} years
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div className="history-user">
+                                                        <p className="history-user-name">{app.user?.name || 'Unknown User'}</p>
+                                                        <small className="history-user-email">{app.user?.email || 'N/A'}</small>
+                                                    </div>
+                                                    <div className="history-date">
+                                                        {app.application_date
+                                                            ? new Date(app.application_date).toLocaleString('en-US', {
+                                                                  year: 'numeric',
+                                                                  month: 'short',
+                                                                  day: 'numeric',
+                                                                  hour: '2-digit',
+                                                                  minute: '2-digit',
+                                                                  hour12: true
+                                                              })
+                                                            : 'N/A'}
+                                                    </div>
+                                                    <div className={`history-status status-${(app.status || 'pending').toLowerCase()}`}>
+                                                        <span className="status-badge">{app.status || 'Pending'}</span>
+                                                    </div>
+                                                    <div className="history-reviewed">
+                                                        {app.reviewedBy ? (
+                                                            <>
+                                                                <span className="history-reviewed-name">{app.reviewedBy.name || app.reviewedBy.email}</span>
+                                                                {app.reviewedBy.email && app.reviewedBy.name && (
+                                                                    <small className="history-reviewed-email">{app.reviewedBy.email}</small>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span className="history-not-reviewed">Not reviewed</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>

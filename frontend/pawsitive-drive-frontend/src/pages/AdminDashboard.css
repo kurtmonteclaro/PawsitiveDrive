@@ -835,3 +835,253 @@
   }
 }
 
+/* ===================================================================
+   ADMIN HISTORY STYLES
+   =================================================================== */
+
+.admin-history-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.admin-history-section {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.admin-history-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.admin-history-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-history-header {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-history-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.admin-history-row:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+  transform: translateY(-2px);
+}
+
+.history-user {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-user-name {
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.history-user-email {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.history-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.history-pet {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.history-pet-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+
+.history-pet-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-pet-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9375rem;
+}
+
+.history-pet-details {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.history-no-pet {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+.history-method {
+  font-size: 0.875rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.history-date {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.history-status {
+  display: flex;
+  align-items: center;
+}
+
+.history-status .status-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.history-status.status-completed .status-badge,
+.history-status.status-approved .status-badge {
+  background: #d4edda;
+  color: #155724;
+}
+
+.history-status.status-pending .status-badge {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.history-status.status-rejected .status-badge,
+.history-status.status-failed .status-badge {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.history-reviewed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-reviewed-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.history-reviewed-email {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.history-not-reviewed {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.admin-history-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* History table responsive for donations */
+.admin-history-section:first-child .admin-history-header {
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
+}
+
+.admin-history-section:first-child .admin-history-row {
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1.5fr 1fr;
+}
+
+/* History table responsive for adoptions */
+.admin-history-section:last-child .admin-history-header {
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
+}
+
+.admin-history-section:last-child .admin-history-row {
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
+}
+
+@media (max-width: 1024px) {
+  .admin-history-header,
+  .admin-history-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .admin-history-header {
+    display: none;
+  }
+
+  .admin-history-row {
+    padding: 1rem;
+  }
+
+  .history-user,
+  .history-pet,
+  .history-reviewed {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .history-user:last-child,
+  .history-pet:last-child,
+  .history-reviewed:last-child {
+    border-bottom: none;
+  }
+}
+

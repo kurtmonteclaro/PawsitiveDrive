@@ -36,6 +36,13 @@ public class AdoptionApplicationsController {
 		return repository.findAll();
 	}
 
+	@GetMapping("/user/{userId}")
+	public List<AdoptionApplications> getByUser(@PathVariable Long userId) {
+		Users user = usersRepository.findById(userId)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		return repository.findByUser(user);
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<AdoptionApplications> get(@PathVariable Long id) {
 		return repository.findById(id)

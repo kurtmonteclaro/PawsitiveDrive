@@ -15,6 +15,10 @@ export default function Profile() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("profile"); // 'profile' or 'history'
+  const [donations, setDonations] = useState([]);
+  const [adoptions, setAdoptions] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     bio: "",
@@ -64,6 +68,39 @@ export default function Profile() {
       setLoading(false);
     }
   }, [user, loadProfile]);
+
+  const loadHistory = useCallback(async () => {
+    if (!user?.user_id && !user?.id) return;
+    
+    setHistoryLoading(true);
+    try {
+      const userId = user.user_id || user.id;
+      console.log('Loading history for user:', userId);
+      const [donationsRes, adoptionsRes] = await Promise.all([
+        axios.get(`${API_ROOT}/donations/user/${userId}`),
+        axios.get(`${API_ROOT}/applications/user/${userId}`)
+      ]);
+      console.log('User donations response:', donationsRes.data);
+      console.log('User donations count:', Array.isArray(donationsRes.data) ? donationsRes.data.length : 'Not an array');
+      const donationsData = Array.isArray(donationsRes.data) ? donationsRes.data : [];
+      setDonations(donationsData);
+      const adoptionsData = Array.isArray(adoptionsRes.data) ? adoptionsRes.data : [];
+      setAdoptions(adoptionsData);
+    } catch (err) {
+      console.error("Failed to load history:", err);
+      console.error("Error response:", err.response?.data);
+      setDonations([]);
+      setAdoptions([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (activeTab === "history" && user) {
+      loadHistory();
+    }
+  }, [activeTab, user]); // Removed loadHistory from deps to avoid infinite loop
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
@@ -184,11 +221,27 @@ export default function Profile() {
     <div className="profile-container">
       <div className="profile-header">
         <h1>My Profile</h1>
-        {!editing && (
+        {!editing && activeTab === "profile" && (
           <button className="btn-edit" onClick={() => setEditing(true)}>
             Edit Profile
           </button>
         )}
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="profile-tabs">
+        <button
+          className={`profile-tab ${activeTab === "profile" ? "active" : ""}`}
+          onClick={() => setActiveTab("profile")}
+        >
+          Profile
+        </button>
+        <button
+          className={`profile-tab ${activeTab === "history" ? "active" : ""}`}
+          onClick={() => setActiveTab("history")}
+        >
+          History
+        </button>
       </div>
 
       {message && (
@@ -197,7 +250,8 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="profile-content">
+      {activeTab === "profile" && (
+        <div className="profile-content">
         <div className="profile-section profile-picture-section">
           <h2>Profile Picture</h2>
           <div className="profile-picture-container">
@@ -310,6 +364,128 @@ export default function Profile() {
           )}
         </div>
       </div>
+      )}
+
+      {activeTab === "history" && (
+        <div className="profile-history">
+          {historyLoading ? (
+            <div className="profile-loading">Loading history...</div>
+          ) : (
+            <>
+              <div className="history-section">
+                <h2>My Donations</h2>
+                {donations.length === 0 ? (
+                  <div className="history-empty">
+                    <p>No donations yet. Start making a difference today!</p>
+                  </div>
+                ) : (
+                  <div className="history-list">
+                    {donations.map((donation) => (
+                      <div key={donation.donation_id} className="history-item donation-item">
+                        <div className="history-item-header">
+                          <span className="history-item-type">Donation</span>
+                          <span className={`history-item-status status-${(donation.status || "pending").toLowerCase()}`}>
+                            {donation.status || "Pending"}
+                          </span>
+                        </div>
+                        <div className="history-item-content">
+                          <div className="history-item-main">
+                            <span className="history-item-amount">₱{donation.amount?.toFixed(2) || "0.00"}</span>
+                            {donation.pet && (
+                              <span className="history-item-pet">for {donation.pet.name}</span>
+                            )}
+                          </div>
+                          <div className="history-item-details">
+                            <span className="history-item-date">
+                              {donation.donation_date
+                                ? new Date(donation.donation_date).toLocaleString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true
+                                  })
+                                : "N/A"}
+                            </span>
+                            {donation.payment_method && (
+                              <span className="history-item-method">{donation.payment_method}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="history-section">
+                <h2>My Adoptions</h2>
+                {adoptions.length === 0 ? (
+                  <div className="history-empty">
+                    <p>No adoption applications yet. Browse available pets to get started!</p>
+                  </div>
+                ) : (
+                  <div className="history-list">
+                    {adoptions.map((adoption) => (
+                      <div key={adoption.application_id} className="history-item adoption-item">
+                        <div className="history-item-header">
+                          <span className="history-item-type">Adoption Application</span>
+                          <span className={`history-item-status status-${(adoption.status || "pending").toLowerCase()}`}>
+                            {adoption.status || "Pending"}
+                          </span>
+                        </div>
+                        <div className="history-item-content">
+                          {adoption.pet && (
+                            <div className="history-item-pet-info">
+                              {adoption.pet.image_url && (
+                                <img
+                                  src={adoption.pet.image_url}
+                                  alt={adoption.pet.name}
+                                  className="history-item-pet-image"
+                                  onError={(e) => {
+                                    e.target.style.display = "none";
+                                  }}
+                                />
+                              )}
+                              <div className="history-item-pet-details">
+                                <span className="history-item-pet-name">{adoption.pet.name}</span>
+                                <span className="history-item-pet-breed">
+                                  {adoption.pet.breed} • {adoption.pet.age} years old
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          <div className="history-item-details">
+                            <span className="history-item-date">
+                              Applied on{" "}
+                              {adoption.application_date
+                                ? new Date(adoption.application_date).toLocaleString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true
+                                  })
+                                : "N/A"}
+                            </span>
+                            {adoption.reviewedBy && (
+                              <span className="history-item-reviewed">
+                                Reviewed by {adoption.reviewedBy.name || adoption.reviewedBy.email}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
