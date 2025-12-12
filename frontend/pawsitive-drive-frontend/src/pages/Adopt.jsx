@@ -10,11 +10,29 @@ export default function Adopt() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // 2 rows × 3 columns
   const { user } = useAuth();
 
   useEffect(() => {
     loadPets();
   }, []);
+
+  // Ensure pets is always an array before rendering
+  const petsArray = Array.isArray(pets) ? pets : [];
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(petsArray.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPets = petsArray.slice(startIndex, endIndex);
+
+  // Reset to page 1 if current page is out of bounds
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   const loadPets = async () => {
     try {
@@ -132,10 +150,10 @@ export default function Adopt() {
     window.location.href = `/donate?petId=${pet.pet_id}&petName=${encodeURIComponent(pet.name || '')}`;
   };
 
-  if (loading) return <div className="loading">Loading pets…</div>;
-
-  // Ensure pets is always an array before rendering
-  const petsArray = Array.isArray(pets) ? pets : [];
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="container">
@@ -152,8 +170,9 @@ export default function Adopt() {
           <p>Check back soon for new pets looking for their forever homes!</p>
         </div>
       ) : (
-        <div className="grid cards">
-          {petsArray.map(p => (
+        <>
+          <div className="grid cards adopt-grid">
+            {currentPets.map(p => (
             <article key={p.pet_id} className="adopt-card">
               <div className="adopt-card-image-wrapper">
                 {p.image_url ? (
@@ -220,7 +239,39 @@ export default function Adopt() {
               </div>
             </article>
           ))}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <div className="pagination-pages">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={`pagination-page ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {selectedPet && (

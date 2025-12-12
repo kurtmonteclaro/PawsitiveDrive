@@ -1085,3 +1085,91 @@
   }
 }
 
+/* Pagination Styles for Admin Dashboard */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 24px 0;
+}
+
+.pagination-btn {
+  padding: 10px 20px;
+  border: 2px solid var(--gray-light);
+  background: var(--white);
+  color: var(--dark);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--white);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pagination-page {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--gray-light);
+  background: var(--white);
+  color: var(--dark);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-page:hover {
+  background: var(--gray-light);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.pagination-page.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: var(--white);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination-pages {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-page {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+}
+
