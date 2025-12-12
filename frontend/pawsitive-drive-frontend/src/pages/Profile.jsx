@@ -100,7 +100,7 @@ export default function Profile() {
     if (activeTab === "history" && user) {
       loadHistory();
     }
-  }, [activeTab, user]); // Removed loadHistory from deps to avoid infinite loop
+  }, [activeTab, user, loadHistory]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
