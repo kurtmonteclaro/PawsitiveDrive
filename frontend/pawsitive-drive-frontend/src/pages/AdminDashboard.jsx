@@ -26,6 +26,8 @@ export default function AdminDashboard() {
     const [filter, setFilter] = useState('All');
     const [appFilter, setAppFilter] = useState('Pending'); // Filter for applications
     const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'applications', or 'history'
+    const [petsCurrentPage, setPetsCurrentPage] = useState(1);
+    const petsItemsPerPage = 6;
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [formLoading, setFormLoading] = useState(false); // Loading state for form submission
@@ -254,6 +256,24 @@ export default function AdminDashboard() {
         if (filter === 'All') return petsArray;
         return petsArray.filter(p => (p.status || '').toLowerCase() === filter.toLowerCase());
     }, [pets, filter]);
+
+    // Calculate pagination for pets
+    const petsTotalPages = Math.ceil(filteredPets.length / petsItemsPerPage);
+    const petsStartIndex = (petsCurrentPage - 1) * petsItemsPerPage;
+    const petsEndIndex = petsStartIndex + petsItemsPerPage;
+    const paginatedPets = filteredPets.slice(petsStartIndex, petsEndIndex);
+
+    // Reset to page 1 if current page is out of bounds or filter changes
+    useEffect(() => {
+        if (petsCurrentPage > petsTotalPages && petsTotalPages > 0) {
+            setPetsCurrentPage(1);
+        }
+    }, [petsCurrentPage, petsTotalPages, filter]);
+
+    const handlePetsPageChange = (page) => {
+        setPetsCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const filteredApplications = useMemo(() => {
         // Ensure applications is always an array
@@ -723,7 +743,7 @@ export default function AdminDashboard() {
                             No pets found in the "{filter}" category.
                         </div>
                     ) : (
-                        filteredPets.map((p) => (
+                        paginatedPets.map((p) => (
                             <div key={p.pet_id} className="admin-pets-row">
                                 <div className="pet-thumb">
                                     {p.image_url ? (
@@ -768,6 +788,37 @@ export default function AdminDashboard() {
                         ))
                     )}
                 </div>
+                
+                {/* Pagination Controls for Pets */}
+                {filteredPets.length > petsItemsPerPage && (
+                    <div className="pagination">
+                        <button
+                            className="pagination-btn"
+                            onClick={() => handlePetsPageChange(petsCurrentPage - 1)}
+                            disabled={petsCurrentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        <div className="pagination-pages">
+                            {Array.from({ length: petsTotalPages }, (_, i) => i + 1).map((page) => (
+                                <button
+                                    key={page}
+                                    className={`pagination-page ${petsCurrentPage === page ? 'active' : ''}`}
+                                    onClick={() => handlePetsPageChange(page)}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            className="pagination-btn"
+                            onClick={() => handlePetsPageChange(petsCurrentPage + 1)}
+                            disabled={petsCurrentPage === petsTotalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
                 </>
             )}
