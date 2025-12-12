@@ -1,5 +1,6 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +20,12 @@ public class Donations {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"profiles", "donations", "password", "applications"})
     private Users user;
 
     @ManyToOne
     @JoinColumn(name = "pet_id", nullable = true)
+    @JsonIgnoreProperties({"applications", "addedBy"})
     private Pets pet;
 
     @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL)

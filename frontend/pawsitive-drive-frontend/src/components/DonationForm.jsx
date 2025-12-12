@@ -1,5 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useDonation } from '../context/DonationContext';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+
+const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 
 const formatPeso = (value) =>
   value.toLocaleString('en-PH', {
@@ -15,6 +19,7 @@ const paymentOptions = [
 
 export default function DonationForm() {
   const { addDonation } = useDonation();
+  const { user } = useAuth();
   const [amount, setAmount] = useState('');
   const [target, setTarget] = useState('general');
   const [petId, setPetId] = useState('');
@@ -45,21 +50,87 @@ export default function DonationForm() {
     setStep('payment');
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
       setError('Please enter a valid donation amount.');
       return;
     }
+
+    if (!user) {
+      setError('Please log in to make a donation.');
+      return;
+    }
+
     setProcessing(true);
-    setTimeout(() => {
+    setError('');
+    
+    try {
+      const userId = user.user_id || user.id;
+      if (!userId) {
+        throw new Error('User ID not found. Please log in again.');
+      }
+
+      // Prepare donation data
+      const donationData = {
+        amount: amountNumber,
+        payment_method: paymentMethod === 'card' ? 'Credit Card' : 'PayPal',
+        status: 'Completed',
+        user: {
+          user_id: userId
+        }
+      };
+
+      // If it's a pet-specific donation, try to find the pet
+      if (target === 'pet' && petId) {
+        try {
+          // Try to find pet by ID first
+          const petIdNum = parseInt(petId);
+          if (!isNaN(petIdNum)) {
+            const petRes = await axios.get(`${API_ROOT}/pets/${petIdNum}`);
+            if (petRes.data) {
+              donationData.pet = {
+                pet_id: petRes.data.pet_id || petRes.data.id
+              };
+            }
+          } else {
+            // If not a number, try to search by name
+            const petsRes = await axios.get(`${API_ROOT}/pets`);
+            const pets = Array.isArray(petsRes.data) ? petsRes.data : [];
+            const foundPet = pets.find(p => 
+              p.name && p.name.toLowerCase().includes(petId.toLowerCase())
+            );
+            if (foundPet) {
+              donationData.pet = {
+                pet_id: foundPet.pet_id || foundPet.id
+              };
+            }
+          }
+        } catch (petErr) {
+          console.warn('Could not find pet, creating general donation:', petErr);
+          // Continue without pet - it's optional
+        }
+      }
+
+      // Save donation to database
+      const response = await axios.post(`${API_ROOT}/donations`, donationData);
+      
+      // Update local donation total
       addDonation(amountNumber);
+      
       setMessage(
-        `Thank you for your donation of ${formatPeso(amountNumber)}${target === 'pet' && petId ? ` for ${petId}` : ''}!`
+        `Thank you for your donation of ${formatPeso(amountNumber)}${donationData.pet ? ` for the pet` : ''}!`
       );
-      setError('');
       resetForm();
+    } catch (err) {
+      console.error('Failed to save donation:', err);
+      setError(
+        err.response?.data?.message || 
+        err.message || 
+        'Failed to process donation. Please try again.'
+      );
+    } finally {
       setProcessing(false);
-    }, 500);
+    }
   };
 
   return (
