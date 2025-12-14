@@ -1,5 +1,6 @@
 package com.pawsitivedrive.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class DonationHistory {
 
     @ManyToOne
     @JoinColumn(name = "donation_id", nullable = false)
+    @JsonIgnoreProperties({"histories"})
     private Donations donation;
 
     // Getters and Setters
