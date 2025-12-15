@@ -28,6 +28,8 @@ export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'applications', or 'history'
     const [petsCurrentPage, setPetsCurrentPage] = useState(1);
     const petsItemsPerPage = 6;
+    const [donationsCurrentPage, setDonationsCurrentPage] = useState(1);
+    const donationsItemsPerPage = 6;
     const [message, setMessage] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [formLoading, setFormLoading] = useState(false); // Loading state for form submission
@@ -222,7 +224,13 @@ export default function AdminDashboard() {
             console.log('Donations response:', donationsRes.data);
             console.log('Donations count:', Array.isArray(donationsRes.data) ? donationsRes.data.length : 'Not an array');
             const donationsData = Array.isArray(donationsRes.data) ? donationsRes.data : [];
-            setDonations(donationsData);
+            // Sort donations by date (newest first)
+            const sortedDonations = [...donationsData].sort((a, b) => {
+                const dateA = a.donation_date ? new Date(a.donation_date).getTime() : 0;
+                const dateB = b.donation_date ? new Date(b.donation_date).getTime() : 0;
+                return dateB - dateA; // Newest first
+            });
+            setDonations(sortedDonations);
             const applicationsData = Array.isArray(adoptionsRes.data) ? adoptionsRes.data : [];
             setApplications(applicationsData);
         } catch (err) {
@@ -298,6 +306,31 @@ export default function AdminDashboard() {
 
     const handlePetsPageChange = (page) => {
         setPetsCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Calculate pagination for donations
+    const donationsTotalPages = Math.ceil(donations.length / donationsItemsPerPage);
+    const donationsStartIndex = (donationsCurrentPage - 1) * donationsItemsPerPage;
+    const donationsEndIndex = donationsStartIndex + donationsItemsPerPage;
+    const paginatedDonations = donations.slice(donationsStartIndex, donationsEndIndex);
+
+    // Reset to page 1 if current page is out of bounds or when tab changes
+    useEffect(() => {
+        if (donationsCurrentPage > donationsTotalPages && donationsTotalPages > 0) {
+            setDonationsCurrentPage(1);
+        }
+    }, [donationsCurrentPage, donationsTotalPages]);
+
+    // Reset donations page when switching to history tab
+    useEffect(() => {
+        if (activeTab === 'history') {
+            setDonationsCurrentPage(1);
+        }
+    }, [activeTab]);
+
+    const handleDonationsPageChange = (page) => {
+        setDonationsCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1086,66 +1119,99 @@ export default function AdminDashboard() {
                                         No donations found.
                                     </div>
                                 ) : (
-                                    <div className="admin-history-table">
-                                        <div className="admin-history-header">
-                                            <span>User</span>
-                                            <span>Amount</span>
-                                            <span>Pet</span>
-                                            <span>Payment Method</span>
-                                            <span>Date</span>
-                                            <span>Status</span>
+                                    <>
+                                        <div className="admin-history-table">
+                                            <div className="admin-history-header">
+                                                <span>User</span>
+                                                <span>Amount</span>
+                                                <span>Pet</span>
+                                                <span>Payment Method</span>
+                                                <span>Date</span>
+                                                <span>Status</span>
+                                            </div>
+                                            <div className="admin-history-body">
+                                                {paginatedDonations.map((donation) => (
+                                                    <div key={donation.donation_id} className="admin-history-row">
+                                                        <div className="history-user">
+                                                            <p className="history-user-name">{donation.user?.name || 'Unknown User'}</p>
+                                                            <small className="history-user-email">{donation.user?.email || 'N/A'}</small>
+                                                        </div>
+                                                        <div className="history-amount">
+                                                            ₱{donation.amount?.toFixed(2) || '0.00'}
+                                                        </div>
+                                                        <div className="history-pet">
+                                                            {donation.pet ? (
+                                                                <>
+                                                                    {donation.pet.image_url && (
+                                                                        <img
+                                                                            src={donation.pet.image_url}
+                                                                            alt={donation.pet.name}
+                                                                            className="history-pet-image"
+                                                                            onError={(e) => {
+                                                                                e.target.style.display = 'none';
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                    <span>{donation.pet.name || 'N/A'}</span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="history-no-pet">General Donation</span>
+                                                            )}
+                                                        </div>
+                                                        <div className="history-method">
+                                                            {donation.payment_method || 'N/A'}
+                                                        </div>
+                                                        <div className="history-date">
+                                                            {donation.donation_date
+                                                                ? new Date(donation.donation_date).toLocaleString('en-US', {
+                                                                      year: 'numeric',
+                                                                      month: 'short',
+                                                                      day: 'numeric',
+                                                                      hour: '2-digit',
+                                                                      minute: '2-digit',
+                                                                      hour12: true
+                                                                  })
+                                                                : 'N/A'}
+                                                        </div>
+                                                        <div className={`history-status status-${(donation.status || 'pending').toLowerCase()}`}>
+                                                            <span className="status-badge">{donation.status || 'Pending'}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="admin-history-body">
-                                            {donations.map((donation) => (
-                                                <div key={donation.donation_id} className="admin-history-row">
-                                                    <div className="history-user">
-                                                        <p className="history-user-name">{donation.user?.name || 'Unknown User'}</p>
-                                                        <small className="history-user-email">{donation.user?.email || 'N/A'}</small>
-                                                    </div>
-                                                    <div className="history-amount">
-                                                        ₱{donation.amount?.toFixed(2) || '0.00'}
-                                                    </div>
-                                                    <div className="history-pet">
-                                                        {donation.pet ? (
-                                                            <>
-                                                                {donation.pet.image_url && (
-                                                                    <img
-                                                                        src={donation.pet.image_url}
-                                                                        alt={donation.pet.name}
-                                                                        className="history-pet-image"
-                                                                        onError={(e) => {
-                                                                            e.target.style.display = 'none';
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                <span>{donation.pet.name || 'N/A'}</span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="history-no-pet">General Donation</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="history-method">
-                                                        {donation.payment_method || 'N/A'}
-                                                    </div>
-                                                    <div className="history-date">
-                                                        {donation.donation_date
-                                                            ? new Date(donation.donation_date).toLocaleString('en-US', {
-                                                                  year: 'numeric',
-                                                                  month: 'short',
-                                                                  day: 'numeric',
-                                                                  hour: '2-digit',
-                                                                  minute: '2-digit',
-                                                                  hour12: true
-                                                              })
-                                                            : 'N/A'}
-                                                    </div>
-                                                    <div className={`history-status status-${(donation.status || 'pending').toLowerCase()}`}>
-                                                        <span className="status-badge">{donation.status || 'Pending'}</span>
-                                                    </div>
+                                        
+                                        {/* Pagination Controls for Donations */}
+                                        {donationsTotalPages > 1 && (
+                                            <div className="pagination">
+                                                <button
+                                                    className="pagination-btn"
+                                                    onClick={() => handleDonationsPageChange(donationsCurrentPage - 1)}
+                                                    disabled={donationsCurrentPage === 1}
+                                                >
+                                                    Previous
+                                                </button>
+                                                <div className="pagination-pages">
+                                                    {Array.from({ length: donationsTotalPages }, (_, i) => i + 1).map((page) => (
+                                                        <button
+                                                            key={page}
+                                                            className={`pagination-page ${donationsCurrentPage === page ? 'active' : ''}`}
+                                                            onClick={() => handleDonationsPageChange(page)}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    ))}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                                <button
+                                                    className="pagination-btn"
+                                                    onClick={() => handleDonationsPageChange(donationsCurrentPage + 1)}
+                                                    disabled={donationsCurrentPage === donationsTotalPages}
+                                                >
+                                                    Next
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
 

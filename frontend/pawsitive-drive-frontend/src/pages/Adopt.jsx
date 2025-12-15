@@ -7,7 +7,6 @@ const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 
 export default function Adopt() {
   const [pets, setPets] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [selectedPet, setSelectedPet] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,8 +59,6 @@ export default function Adopt() {
       console.error('Failed to load pets:', err);
       console.error('Error details:', err.response?.data || err.message);
       setPets([]); // Always set to empty array on error
-    } finally {
-      setLoading(false);
     }
   };
 

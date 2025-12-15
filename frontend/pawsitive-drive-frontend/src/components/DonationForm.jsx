@@ -28,6 +28,9 @@ export default function DonationForm() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [receipt, setReceipt] = useState(null);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [lastDonationId, setLastDonationId] = useState(null);
 
   const amountNumber = useMemo(() => parseFloat(amount || '0'), [amount]);
 
@@ -37,6 +40,21 @@ export default function DonationForm() {
     setPetId('');
     setPaymentMethod('card');
     setStep('input');
+    // Don't reset lastDonationId and receipt - keep them for showing receipt
+  };
+
+  const handleShowReceipt = async () => {
+    if (!lastDonationId) return;
+    
+    try {
+      const receiptResponse = await axios.get(`${API_ROOT}/donations/${lastDonationId}/receipt`);
+      setReceipt(receiptResponse.data);
+      setShowReceipt(true);
+    } catch (receiptErr) {
+      console.error('Could not fetch receipt:', receiptErr);
+      setError('Failed to load receipt. Please try again later.');
+      setTimeout(() => setError(''), 5000);
+    }
   };
 
   const handlePrimarySubmit = (e) => {
@@ -112,7 +130,11 @@ export default function DonationForm() {
       }
 
       // Save donation to database
-      await axios.post(`${API_ROOT}/donations`, donationData);
+      const donationResponse = await axios.post(`${API_ROOT}/donations`, donationData);
+      const savedDonation = donationResponse.data;
+      
+      // Store donation ID for receipt viewing
+      setLastDonationId(savedDonation.donation_id);
       
       // Update local donation total
       addDonation(amountNumber);
@@ -251,7 +273,109 @@ export default function DonationForm() {
 
       {message && (
         <div className="donation-message donation-message-success">
-          {message}
+          <div>{message}</div>
+          {lastDonationId && (
+            <button
+              className="btn-show-receipt"
+              onClick={handleShowReceipt}
+            >
+              Show Receipt
+            </button>
+          )}
+        </div>
+      )}
+
+      {showReceipt && receipt && (
+        <div className="receipt-modal-overlay" onClick={() => setShowReceipt(false)}>
+          <div className="receipt-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="receipt-modal-header">
+              <h2>Donation Receipt</h2>
+              <button className="receipt-modal-close" onClick={() => setShowReceipt(false)}>×</button>
+            </div>
+            <div className="receipt-content">
+              <div className="receipt-header">
+                <h3>Pawsitive Drive</h3>
+                <p>Donation Receipt</p>
+              </div>
+              
+              <div className="receipt-info">
+                <div className="receipt-row">
+                  <span className="receipt-label">Receipt Number:</span>
+                  <span className="receipt-value">{receipt.receipt_number || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Date:</span>
+                  <span className="receipt-value">
+                    {receipt.receipt_date 
+                      ? new Date(receipt.receipt_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      : 'N/A'}
+                  </span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Donor Name:</span>
+                  <span className="receipt-value">{receipt.donor_name || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Donor Email:</span>
+                  <span className="receipt-value">{receipt.donor_email || 'N/A'}</span>
+                </div>
+                {receipt.donor_address && (
+                  <div className="receipt-row">
+                    <span className="receipt-label">Address:</span>
+                    <span className="receipt-value">{receipt.donor_address}</span>
+                  </div>
+                )}
+                <div className="receipt-row">
+                  <span className="receipt-label">Payment Method:</span>
+                  <span className="receipt-value">{receipt.payment_method || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Transaction ID:</span>
+                  <span className="receipt-value">{receipt.transaction_id || 'N/A'}</span>
+                </div>
+                <div className="receipt-row receipt-amount-row">
+                  <span className="receipt-label">Amount:</span>
+                  <span className="receipt-amount">
+                    {receipt.donation 
+                      ? formatPeso(receipt.donation.amount || 0)
+                      : formatPeso(amountNumber || 0)}
+                  </span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Status:</span>
+                  <span className={`receipt-status status-${(receipt.status || 'completed').toLowerCase()}`}>
+                    {receipt.status || 'Completed'}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="receipt-footer">
+                <p>Thank you for your generous donation!</p>
+                <p className="receipt-note">This receipt serves as proof of your donation.</p>
+              </div>
+              
+              <div className="receipt-actions">
+                <button 
+                  className="btn primary" 
+                  onClick={() => window.print()}
+                >
+                  Print Receipt
+                </button>
+                <button 
+                  className="btn outline" 
+                  onClick={() => setShowReceipt(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
