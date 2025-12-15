@@ -23,6 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/donations")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DonationsController {
 
 	private final DonationsRepository donationsRepository;
@@ -61,6 +62,25 @@ public class DonationsController {
 		return donationsRepository.findById(id)
 			.map(ResponseEntity::ok)
 			.orElse(ResponseEntity.notFound().build());
+	}
+
+	@GetMapping("/{id}/receipt")
+	public ResponseEntity<DonationReceipt> getReceipt(@PathVariable Long id) {
+		Donations donation = donationsRepository.findById(id)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Donation not found"));
+		
+		return donationReceiptRepository.findByDonation(donation)
+			.map(ResponseEntity::ok)
+			.orElse(ResponseEntity.notFound().build());
+	}
+
+	@GetMapping("/{id}/history")
+	public ResponseEntity<List<DonationHistory>> getHistory(@PathVariable Long id) {
+		Donations donation = donationsRepository.findById(id)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Donation not found"));
+		
+		List<DonationHistory> history = donationHistoryRepository.findByDonation(donation);
+		return ResponseEntity.ok(history);
 	}
 
 	@PostMapping

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import "./Profile.css";
+import "../pages/Donate.css";
 
 const API_ROOT = process.env.REACT_APP_API_BASE ?? 'http://localhost:8080/api';
 
@@ -19,6 +20,10 @@ export default function Profile() {
   const [donations, setDonations] = useState([]);
   const [adoptions, setAdoptions] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [donationsCurrentPage, setDonationsCurrentPage] = useState(1);
+  const donationsItemsPerPage = 6;
   
   const [formData, setFormData] = useState({
     bio: "",
@@ -83,7 +88,13 @@ export default function Profile() {
       console.log('User donations response:', donationsRes.data);
       console.log('User donations count:', Array.isArray(donationsRes.data) ? donationsRes.data.length : 'Not an array');
       const donationsData = Array.isArray(donationsRes.data) ? donationsRes.data : [];
-      setDonations(donationsData);
+      // Sort donations by date (newest first)
+      const sortedDonations = [...donationsData].sort((a, b) => {
+        const dateA = a.donation_date ? new Date(a.donation_date).getTime() : 0;
+        const dateB = b.donation_date ? new Date(b.donation_date).getTime() : 0;
+        return dateB - dateA; // Newest first
+      });
+      setDonations(sortedDonations);
       const adoptionsData = Array.isArray(adoptionsRes.data) ? adoptionsRes.data : [];
       setAdoptions(adoptionsData);
     } catch (err) {
@@ -99,8 +110,59 @@ export default function Profile() {
   useEffect(() => {
     if (activeTab === "history" && user) {
       loadHistory();
+      setDonationsCurrentPage(1); // Reset to page 1 when loading history
     }
   }, [activeTab, user, loadHistory]);
+
+  // Calculate pagination for donations
+  const donationsTotalPages = Math.ceil(donations.length / donationsItemsPerPage);
+  const donationsStartIndex = (donationsCurrentPage - 1) * donationsItemsPerPage;
+  const donationsEndIndex = donationsStartIndex + donationsItemsPerPage;
+  const paginatedDonations = donations.slice(donationsStartIndex, donationsEndIndex);
+
+  // Reset to page 1 if current page is out of bounds
+  useEffect(() => {
+    if (donationsCurrentPage > donationsTotalPages && donationsTotalPages > 0) {
+      setDonationsCurrentPage(1);
+    }
+  }, [donationsCurrentPage, donationsTotalPages]);
+
+  const handleDonationsPageChange = (page) => {
+    setDonationsCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const loadReceipt = async (donationId) => {
+    try {
+      const receiptRes = await axios.get(`${API_ROOT}/donations/${donationId}/receipt`);
+      if (receiptRes.data) {
+        setSelectedReceipt(receiptRes.data);
+        setShowReceipt(true);
+      } else {
+        setMessage("Receipt not found for this donation.");
+        setTimeout(() => setMessage(""), 3000);
+      }
+    } catch (err) {
+      console.error("Failed to load receipt:", err);
+      if (err.response?.status === 404) {
+        setMessage("Receipt not available for this donation. Receipts are only available for donations made after the receipt feature was implemented.");
+        setTimeout(() => setMessage(""), 5000);
+      } else if (err.response?.status === 403) {
+        setMessage("Access denied. Please make sure you're logged in.");
+        setTimeout(() => setMessage(""), 5000);
+      } else {
+        setMessage("Failed to load receipt. Please try again.");
+        setTimeout(() => setMessage(""), 5000);
+      }
+    }
+  };
+
+  const formatPeso = (value) =>
+    value.toLocaleString('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+    });
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
@@ -379,8 +441,9 @@ export default function Profile() {
                     <p>No donations yet. Start making a difference today!</p>
                   </div>
                 ) : (
+                  <>
                   <div className="history-list">
-                    {donations.map((donation) => (
+                    {paginatedDonations.map((donation) => (
                       <div key={donation.donation_id} className="history-item donation-item">
                         <div className="history-item-header">
                           <span className="history-item-type">Donation</span>
@@ -412,10 +475,50 @@ export default function Profile() {
                               <span className="history-item-method">{donation.payment_method}</span>
                             )}
                           </div>
+                          <div className="history-item-actions">
+                            <button
+                              className="btn-receipt"
+                              onClick={() => loadReceipt(donation.donation_id)}
+                            >
+                              View Receipt
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Pagination Controls for Donations */}
+                  {donationsTotalPages > 1 && (
+                    <div className="pagination">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => handleDonationsPageChange(donationsCurrentPage - 1)}
+                        disabled={donationsCurrentPage === 1}
+                      >
+                        Previous
+                      </button>
+                      <div className="pagination-pages">
+                        {Array.from({ length: donationsTotalPages }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            className={`pagination-page ${donationsCurrentPage === page ? 'active' : ''}`}
+                            onClick={() => handleDonationsPageChange(page)}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => handleDonationsPageChange(donationsCurrentPage + 1)}
+                        disabled={donationsCurrentPage === donationsTotalPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                  </>
                 )}
               </div>
 
@@ -484,6 +587,100 @@ export default function Profile() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {showReceipt && selectedReceipt && (
+        <div className="receipt-modal-overlay" onClick={() => setShowReceipt(false)}>
+          <div className="receipt-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="receipt-modal-header">
+              <h2>Donation Receipt</h2>
+              <button className="receipt-modal-close" onClick={() => setShowReceipt(false)}>×</button>
+            </div>
+            <div className="receipt-content">
+              <div className="receipt-header">
+                <h3>Pawsitive Drive</h3>
+                <p>Donation Receipt</p>
+              </div>
+              
+              <div className="receipt-info">
+                <div className="receipt-row">
+                  <span className="receipt-label">Receipt Number:</span>
+                  <span className="receipt-value">{selectedReceipt.receipt_number || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Date:</span>
+                  <span className="receipt-value">
+                    {selectedReceipt.receipt_date 
+                      ? new Date(selectedReceipt.receipt_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      : 'N/A'}
+                  </span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Donor Name:</span>
+                  <span className="receipt-value">{selectedReceipt.donor_name || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Donor Email:</span>
+                  <span className="receipt-value">{selectedReceipt.donor_email || 'N/A'}</span>
+                </div>
+                {selectedReceipt.donor_address && (
+                  <div className="receipt-row">
+                    <span className="receipt-label">Address:</span>
+                    <span className="receipt-value">{selectedReceipt.donor_address}</span>
+                  </div>
+                )}
+                <div className="receipt-row">
+                  <span className="receipt-label">Payment Method:</span>
+                  <span className="receipt-value">{selectedReceipt.payment_method || 'N/A'}</span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Transaction ID:</span>
+                  <span className="receipt-value">{selectedReceipt.transaction_id || 'N/A'}</span>
+                </div>
+                <div className="receipt-row receipt-amount-row">
+                  <span className="receipt-label">Amount:</span>
+                  <span className="receipt-amount">
+                    {selectedReceipt.donation 
+                      ? formatPeso(selectedReceipt.donation.amount || 0)
+                      : 'N/A'}
+                  </span>
+                </div>
+                <div className="receipt-row">
+                  <span className="receipt-label">Status:</span>
+                  <span className={`receipt-status status-${(selectedReceipt.status || 'completed').toLowerCase()}`}>
+                    {selectedReceipt.status || 'Completed'}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="receipt-footer">
+                <p>Thank you for your generous donation!</p>
+                <p className="receipt-note">This receipt serves as proof of your donation.</p>
+              </div>
+              
+              <div className="receipt-actions">
+                <button 
+                  className="btn primary" 
+                  onClick={() => window.print()}
+                >
+                  Print Receipt
+                </button>
+                <button 
+                  className="btn outline" 
+                  onClick={() => setShowReceipt(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
